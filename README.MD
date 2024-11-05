@@ -17,7 +17,6 @@
 
 - [Установка и запуск сайта](#установка-и-запуск-сайта)
   - [Как развернуть dev-версию сайта](#как-развернуть-dev-версию-сайта)
-  - [Как развернуть stage-версию сайта](#как-развернуть-stage-версию-сайта)
   - [Как развернуть prod-версию сайта](#как-развернуть-prod-версию-сайта)
   - [Получение токена для пользователя (пр. admin)](#получение-токена-для-пользователя)
 - [Проверить запуск сайта](#проверить-запуск-сайта)
@@ -95,42 +94,6 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-## Как развернуть stage-версию сайта
-Установите Docker и docker compose следуя инструкциям в [документации Docker](https://docs.docker.com/engine/install/)
-
-Установите переменные окружения:
-
-`SECRET_KEY` - уникальный ключ проекта.
-
-`DEBUG` - установите 1 для разработки.
-
-`ALLOWED_HOSTS` - см [Django docs](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts).
-
-`DATABASE` - имя, используемое в sh скрипте для определения типа базы данных (пр. postgres)
-
-`DB_ENGINE` - имя, указывает на используемый движок для доступа к БД. (пр. "django.db.backends.postgresql")
-
-`DB_NAME` - имя базы данных
-
-`DB_USER` - имя пользователя для доступа к базе данных
-
-`DB_PASSWORD` - пароль пользователя для доступа к базе данных
-
-`DB_HOST` - имя или ip адрес хоста на котором располагается база данных (в случае развертывания в docker тут пишем имя соответствующего сервиса из docker-compose)
-
-`DB_PORT` - порт на котором развернута база данных на хосте
-
-`TG_TOKEN` - токен телеграмм бота для сбора логов
-
-`TG_CHART_ID`= id пользователя или группы телеграмм
-
-`LOG_ENV` - вид окружения для логов (development или production)
-
-Запустите развертывание сайта в Docker:
-
-```sh
-docker-compose --env-file .env.stage up -d --build
-```
 
 ## Как развернуть prod-версию сайта
 Установите Docker и docker compose следуя инструкциям в [документации Docker](https://docs.docker.com/engine/install/)
@@ -139,7 +102,7 @@ docker-compose --env-file .env.stage up -d --build
 
 `SECRET_KEY` - уникальный ключ проекта.
 
-`DEBUG` - установите 0.
+`DEBUG` - установите 0 если развертываете в prodaction или 1 в остальных случаях.
 
 `ALLOWED_HOSTS` - см [Django docs](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts).
 
@@ -166,31 +129,31 @@ docker-compose --env-file .env.stage up -d --build
 Запустите развертывание сайта в Docker:
 
 ```sh
-docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+docker-compose --env-file .env.prod up -d --build
 ```
 
 Выполните миргации:
 
 ```sh
-docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+docker-compose exec web python manage.py migrate --noinput
 ```
 
 Выполните создание супер-пользователя:
 
 ```sh
-docker-compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
+docker-compose exec web python manage.py createsuperuser
 ```
 
 Выполните сбор статики:
 
 ```sh
-docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+docker-compose exec web python manage.py collectstatic --no-input --clear
 ```
 
-Получите SSL сертификаты:
+Получите SSL сертификаты для production:
 
 ```sh
-sudo nano docker-compose.prod.yml
+sudo nano docker-compose.yml
 ```
 
 закомментируйте строку следующую строку файла и сохраните его:
@@ -208,7 +171,7 @@ sudo nano nginx/nginx.conf
 Запустите заново сборку контейнеров
 
 ```sh
-docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+docker-compose --env-file .env.prod up -d --build
 ```
 
 
