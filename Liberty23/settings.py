@@ -35,7 +35,7 @@ DEBUG = env.bool('DEBUG', True)
 # ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
-CSRF_TRUSTED_ORIGINS = ['*']
+CSRF_TRUSTED_ORIGINS = ['http://', 'https://']
 LOG_ENV = env('LOG_ENV', 'development' if DEBUG else 'production')
 
 # Application definition
