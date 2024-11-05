@@ -1,0 +1,53 @@
+{% load catalog_tags %}
+
+<div class="col-md-6 col-lg-4 product-card-parent_indent">
+    <div class="product-card">
+        <div class="product-container">
+            <div class="product-card__image">
+                <img class="img-fluid img-thumbnail thumbnail-210" src="{{ product.get_image }}" alt="{{ product.name }}">
+                <div class="product-card__image-content">
+                    <a href="{% url 'catalog:product' product.id %}"><i class="organik-icon-visibility"></i></a>
+                    <a name="add-to-cart" href="javascript:void(0);">
+                        <form name="add-to-cart-form" action="{% url 'cart:add' product_id=product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value=1>
+                            <input type="hidden" name="unit" value="{{ product.unit }}">
+                            {% with current_price=prices|get_current_price:product %}
+                                {% if current_price %}
+                                    <input type="hidden" name="price" value="{{ current_price.price|floatformat:2|decimal_price }}">
+                                {% else %}
+                                    <input type="hidden" name="price" value="0.00">
+                                {% endif %}
+                            {% endwith %}
+                            {% if cart_item %}
+                                <input type="hidden" name="update" value="{{ cart_item.update }}">
+                            {% else %}
+                                <input type="hidden" name="update" value=0>
+                            {% endif %}
+                        </form>
+                        <i class="organik-icon-shopping-cart"></i>
+                        {% if cart_item %}
+                            <span id="cart-count-{{product.id}}" class="cart-count">{{ cart_item.quantity }}</span>
+                        {% else %}
+                            <span id="cart-count-{{product.id}}" class="cart-count" style="display: none;"></span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            <div class="product-card__content">
+                <div class="product-card__left">
+                    <h3><a href="{% url 'catalog:product' product.id %}">{{ product.name }}</a></h3>
+                    {% with current_price=prices|get_current_price:product %}
+                        {% if current_price %}
+                            <p>р.{{ current_price.price }}</p>
+                        {% else %}
+                            <p>р.0,00</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="product-card__right">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

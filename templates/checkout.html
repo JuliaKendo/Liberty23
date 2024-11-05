@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block page %}
+
+<div class="stricky-header stricked-menu main-menu">
+	<div class="sticky-header__content"></div>
+</div>
+
+<!-- <section class="page-header">
+	<div class="page-header__bg" style="background-image: url("{% static '/images/backgrounds/page-header-bg-1-1.jpg' %}");"></div>
+	
+	<div class="container">
+		<h2>Заказы</h2>
+		<ul class="thm-breadcrumb list-unstyled">
+			<li><a href="/">Главная</a></li>
+		</ul>
+	</div>
+</section> -->
+
+<section class="checkout-page">
+	<div class="container">
+		{% if not request.user.is_authenticated %}
+			<p>Уже регистрировались? <a href="#" class="login__toggler main-menu__login_item">Нажмите для входа</a></p>
+		{% endif %}
+		<div class="row">
+			<div class="col-lg-6">
+				<h3>Детали заказа</h3>
+				{% with delivery_address=delivery_addresses|first %}
+				<form id="primary-form" action="{% url 'orders:add' %}" class="contact-form-validated contact-one__form">
+					<div class="row">
+						{% csrf_token %}
+						<div class="col-md-12" style="display: none;">
+							<select class="selectpicker">
+								<option value="">РФ</option>
+							</select>
+						</div>
+						<span class="col-md-12 text-danger text-error" name="username" style="display: none;"></span>
+						<div class="col-md-6">
+							<input type="text" name="fname" placeholder="Имя" value="{{ delivery_address.fname|default:'' }}">
+						</div>
+						<div class="col-md-6">
+							<input type="text" name="lname" placeholder="Фамилия" value="{{ delivery_address.lname|default:'' }}">
+						</div>
+						<div class="col-md-12">
+							<input type="text" name="company" placeholder="Компания" value="{{ delivery_address.company|default:'' }}">
+						</div>
+						<span class="col-md-12 text-danger text-error" name="address" style="display: none;"></span>
+						<div class="col-md-12">
+							<input type="text" name="address" placeholder="Адрес" value="{{ delivery_address.address|default:'' }}">
+						</div>
+						<!-- <div class="col-md-12">
+							<input type="text" name="appartment" placeholder="Appartment, Unit, etc. (optional)">
+						</div> -->
+						<div class="col-md-12">
+							<input type="text" name="town" placeholder="Город" value="{{ delivery_address.town|default:'' }}">
+						</div>
+						<div class="col-md-6">
+							<input type="text" placeholder="Область / Край" name="state" value="{{ delivery_address.state|default:'' }}">
+						</div>
+						<div class="col-md-6">
+							<input type="text" placeholder="Индекс" name="zip" value="{{ delivery_address.zip|default:'' }}">
+						</div>
+						<span class="col-md-12 text-danger text-error" name="email" style="display: none;"></span>
+						<span class="col-md-12 text-danger text-error" name="phone" style="display: none;"></span>
+						<div class="col-md-6">
+							<input type="email" placeholder="Email" name="email" value="{{ delivery_address.email|default:'' }}">
+						</div>
+						<div class="col-md-6">
+							<input type="text" placeholder="Телефон" name="phone" value="{{ delivery_address.phone|default:'' }}">
+						</div>
+						{% if not request.user.is_authenticated %}
+						<span class="col-md-12 text-danger text-error" name="createAccount" style="display: none;"></span>
+						<div class="col-md-12">
+							<div class="form-group">
+								<input type="checkbox" id="createAccount" name="createAccount">
+								<label for="createAccount">Зарегистрировать нового пользователя</label>
+							</div>
+						</div>
+						{% endif %}
+					</div>
+				</form>
+				{% endwith %}
+			</div>
+			<div class="col-lg-6">
+				<h3>
+					<input type="checkbox" id="shipDetails">
+					<label for="shipDetails">Адрес доставки (отличный от основного)</label>
+				</h3>
+				<form id="additional-form" action="{% url 'orders:add' %}" class="contact-form-validated contact-one__form">
+					<div class="row">
+						{% csrf_token %}
+						<div class="col-md-12" style="display: none;">
+							<select class="selectpicker">
+								<option value="">РФ</option>
+							</select>
+						</div>
+						<div class="col-md-6">
+							<input type="text" name="fname" placeholder="Имя">
+						</div>
+						<div class="col-md-6">
+							<input type="text" name="lname" placeholder="Фамилия">
+						</div>
+						<div class="col-md-12">
+							<input type="text" name="company" placeholder="Компания">
+						</div>
+						<div class="col-md-12">
+							<input type="text" name="address" placeholder="Адрес">
+						</div>
+						<!-- <div class="col-md-12">
+							<input type="text" name="appartment" placeholder="Appartment, Unit, etc. (optional)">
+						</div> -->
+						<div class="col-md-12">
+							<input type="text" name="town" placeholder="Город">
+						</div>
+						<div class="col-md-6">
+							<input type="text" placeholder="Область / Край" name="state">
+						</div>
+						<div class="col-md-6">
+							<input type="text" placeholder="Индекс" name="zip">
+						</div>
+						<div class="col-md-6">
+							<input type="email" placeholder="Email" name="email">
+						</div>
+						<div class="col-md-6">
+							<input type="text" placeholder="Телефон" name="phone">
+						</div>
+						<div class="col-md-12">
+							<textarea name="notes" placeholder="Дополнительная информация о заказе"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<h3 class="order-title">ВАШ ЗАКАЗ</h3>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="order-details">
+					<div class="order-details__top">
+						<p>Товар</p>
+						<p>Стоимость</p>
+					</div>
+					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
+					{% for cart_item in cart %}
+					{% with product=cart_item.product %}
+						<p>
+							<span>{{ product.name }}</span>
+							{% if cart_item.total_price %}
+								<span>{{ cart_item.total_price }} руб.</span>
+                            {% else %}
+								<span>0,00 руб.</span>
+                            {% endif %}
+						</p>
+					{% endwith %}
+					{% endfor %}
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="order-payment">
+					<ul id="accordion" class="list-unstyled" data-wow-duration="1500ms">
+						<li>
+							<h2 class="para-title active">
+								<span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+									Direct Bank Transfer
+								</span>
+							</h2>
+							<div id="collapseTwo" class="collapse show" role="button" aria-labelledby="collapseTwo" data-parent="#accordion">
+								<p>Make your payment directly into our bank account. Please
+									use your Order ID as the payment reference. Your order
+									wont be shipped until the funds have cleared.</p>
+							</div>
+						</li>
+						<li>
+							<h2 class="para-title ">
+								<span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+									Paypal Payment
+									<img src="{% static '/images/products/paypal-1-1.jpg' %}" alt="">
+								</span>
+							</h2>
+							<div id="collapseOne" class="collapse " aria-labelledby="collapseOne" data-parent="#accordion">
+								<p>Make your payment directly into our bank account. Please
+									use your Order ID as the payment reference. Your order
+									wont be shipped until the funds have cleared.</p>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<div class="text-right">
+					<a href="javascript:void(0);" class="thm-btn" id="submit-order" data-url="{% url 'catalog:products' %}">Заказать</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+{% endblock %}

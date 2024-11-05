@@ -1,0 +1,31 @@
+{% load static %}
+{% load cart_tags %}
+
+<div class="row cart-basement">
+    <div class="col-lg-8">
+        <!-- <form action="#" class="contact-one__form">
+            <input type="text" placeholder="Enter Coupon Code">
+            <button type="submit" class="thm-btn">Apply Coupon</button>
+        </form> -->
+    </div>
+    <div class="col-lg-4">
+        <ul class="cart-total list-unstyled">
+            <li>
+                <span>Всего</span>
+                <span>{{ cart.get_total_price }} руб.</span>
+            </li>
+            <li>
+                <span>Стоимость доставки</span>
+                <span>0,00 руб.</span>
+            </li>
+            <li>
+                <span>Итого</span>
+                <span>{{ cart.get_total_price }} руб.</span>
+            </li>
+        </ul>
+        <div class="button-box">
+            <a href="#" class="thm-btn" style="visibility: hidden;">Обновить</a>
+            <a href="/orders/checkout" class="thm-btn">Заказать</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load catalog_tags %}
+{% block page %}
+
+<div class="stricky-header stricked-menu main-menu">
+    <div class="sticky-header__content"></div>
+</div>
+<!-- <section class="page-header">
+    <div class="page-header__bg" style="background-image: url("{% static '/images/backgrounds/page-header-bg-1-1.jpg' %}");"></div>
+    <div class="container">
+        <h2>Каталог</h2>
+        <ul class="thm-breadcrumb list-unstyled">
+            <li><a href="/">Главная</a></li>
+        </ul>
+    </div>
+</section> -->
+
+<section class="products-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-3">
+                <div class="product-sidebar">
+                    <div class="product-sidebar__single product-sidebar__search-widget">
+                        <form name="products-search" action="{% url 'catalog:products' %}">
+                            {% csrf_token %}
+                            {% if search_values %}
+                                <input type="text" name="search_values" placeholder="Поиск" value="{{ search_values|first }}">
+                            {% else %}
+                                <input type="text" name="search_values" placeholder="Поиск">
+                            {% endif %}
+                            <button class="organik-icon-magnifying-glass" type="submit"></button>
+                        </form>
+                    </div>
+                    
+                    {% include "components/products/filters.html" %}    
+
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-9" id="products-container">
+                <div class="product-sorter">
+                    <p>Всего {{ page_obj.start_index }}–{{ page_obj.end_index }} из {{ paginator.count }} товаров</p>
+                    <div class="product-sorter__select">
+                        <select class="selectpicker">
+                            {% if sort_by.name == "sort_ascending" %}
+                                <option value="sort_ascending" selected>по возрастанию</option>
+                            {% else %}
+                                <option value="sort_ascending">по возрастанию</option>
+                            {% endif %}
+                            {% if sort_by.name == "sort_descending" %}
+                                <option value="sort_descending" selected>по убыванию</option>
+                            {% else %}
+                                <option value="sort_descending">по убыванию</option>
+                            {% endif %}     
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {% for product in products %}
+                        {% with cart_item=cart|get_cart_item:product %}
+                            {% include "components/products/thumbnail.html" with product=product prices=prices cart_item=cart_item %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+    
+                <div class="row" style="margin-top: 150px">
+                    {% include "components/products/paginator.html" with paginator=paginator page_obj=page_obj %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

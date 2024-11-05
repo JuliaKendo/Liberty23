@@ -1,0 +1,43 @@
+
+<div class="login__overlay login__toggler"></div>
+<div class="login__content">
+    <div class="login__top">
+        <h3 class="login__title">Регистрация</h3>
+        <span class="login__close login__toggler"><i class="organik-icon-close"></i></span>
+    </div><!-- /.login__top -->
+
+    <form id="signup-form" method="post" action="{% url 'signup' %}">
+        {% csrf_token %} 
+        <div>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="error">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="error">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="thm-btn" style="margin-top: 100px;">Зарегистрироваться</button>
+    </form>
+
+</div><!-- /.login__content -->
+

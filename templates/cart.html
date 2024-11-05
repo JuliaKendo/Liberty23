@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load cart_tags %}
+{% block page %}
+
+<div class="stricky-header stricked-menu main-menu">
+    <div class="sticky-header__content"></div>
+</div>
+
+<!-- <section class="page-header">
+    <div class="page-header__bg" style="background-image: url("{% static '/images/backgrounds/page-header-bg-1-1.jpg' %}");"></div>
+    <div class="container">
+        <h2>Корзина</h2>
+        <ul class="thm-breadcrumb list-unstyled">
+            <li><a href="/">Главная</a></li>
+        </ul>
+    </div>
+</section> -->
+
+<section class="cart-page">
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table cart-table">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Цена</th>
+                        <th>Кол-во</th>
+                        <th>Итого</th>
+                        <th>Удалить</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cart_item in cart %}
+                    {% with product=cart_item.product %}
+                        <tr name="cart-row">
+                            <td>
+                                <div class="product-box">
+                                    <img src="{{ product.image }}" alt="{{ product.name }}">
+                                    <h3><a href="{% url 'catalog:product' product.id %}">{{ product.name }}</a></h3>
+                                </div>
+                            </td>
+                            {% if cart_item.price %}
+                                <td>р.{{ cart_item.price }}</td>
+                            {% else %}
+                                <td>р.0,00</td>
+                            {% endif %}
+                            <td>
+                                <div class="quantity-box">
+
+                                    <form name="cart-form" action="#">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value=1>
+                                        <input type="hidden" name="unit" value="{{ product.unit }}">
+                                        {% if cart_item.price %}
+                                            <input type="hidden" name="price" value="{{ cart_item.price|floatformat:2|decimal_price }}">
+                                        {% else %}
+                                            <input type="hidden" name="price" value="0.00">
+                                        {% endif %}
+                                        <input type="hidden" name="update" value="1">
+                                    </form>
+                                    <button type="button" class="sub" data-url="{% url 'cart:sub' product_id=product.id %}">-</button>
+                                    <input type="number" id="cart-{{ product.id }}" value="{{ cart_item.quantity }}" data-url="{% url 'cart:add' product_id=product.id %}" />
+                                    <button type="button" class="add" data-url="{% url 'cart:add' product_id=product.id %}">+</button>
+                                </div>
+                            </td>
+                            {% if cart_item.total_price %}
+                                <td name="total_price">р.{{ cart_item.total_price }}</td>
+                            {% else %}
+                                <td name="total_price">р.0,00</td>
+                            {% endif %}
+                            <td>
+                                <a name="remove-from-cart" href="{% url 'cart:remove' product_id=product.id %}">
+                                    <i class="organik-icon-close remove-icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    
+        {% include "components/cart/cart-amounts.html" %}
+    
+    </div><!-- /.container -->
+</section><!-- /.cart-page -->
+
+{% endblock %}

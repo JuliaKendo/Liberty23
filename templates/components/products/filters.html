@@ -1,0 +1,30 @@
+{% load static %}
+{% load catalog_tags %}
+
+<!-- <div class="product-sidebar__single">
+    <h3>Стоимость</h3>
+    <div class="product-sidebar__price-range">
+        <div class="range-slider-price" id="range-slider-price"></div>
+        <div class="form-group">
+            <div class="left">
+                <p>р.<span id="min-value-rangeslider"></span></p>
+                <span>-</span>
+                <p>р.<span id="max-value-rangeslider"></span></p>
+            </div>
+            <div class="right">
+                <input type="submit" class="thm-btn" value="Filter">
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="product-sidebar__single">
+    <h3>Категории</h3>
+    <ul class="list-unstyled product-sidebar__links">
+        {% if "category" in filters %}
+            {% for item in filters.category.tree %}
+                <li><a href="{{ request.path }}?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}category={{ item|get_ident:'category__name' }}">{{ item.category__name }} <i class="fa fa-angle-right"></i></a></li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>

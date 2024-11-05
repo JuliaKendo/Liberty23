@@ -1,0 +1,60 @@
+{% load static %}
+
+<section class="main-slider">
+    <div class="swiper-container thm-swiper__slider" data-swiper-options='{
+"slidesPerView": 1,
+"loop": true,
+"effect": "fade",
+"autoplay": {
+"delay": 5000
+},
+"navigation": {
+"nextEl": "#main-slider__swiper-button-next",
+"prevEl": "#main-slider__swiper-button-prev"
+}
+}'>
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="image-layer" style="background-image: url('{% static "images/main-slider/main-slider-3-1.jpg" %}')">
+                </div>
+                <!-- /.image-layer -->
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 text-center">
+                            <h2><span>Свобода 23</span>
+                                <!-- <br>Food Market -->
+                            </h2>
+                            <a href="{% url 'catalog:products' %}" class=" thm-btn">Сделать заказ</a>
+                            <!-- /.thm-btn dynamic-radius -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="image-layer" style="background-image: url('{% static "images/main-slider/main-slider-3-1.jpg" %}')">
+                </div>
+                <!-- /.image-layer -->
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 text-center">
+                            <h2>
+                                <!-- <span>Свобода 23</span>  -->
+                                Магазин продуктов
+                            </h2>
+                            <a href="{% url 'catalog:products' %}" class=" thm-btn">Сделать заказ</a>
+                            <!-- /.thm-btn dynamic-radius -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- If we need navigation buttons -->
+        <div class="main-slider__nav" style="display: none;">
+            <div class="swiper-button-prev" id="main-slider__swiper-button-next"><i class="organik-icon-left-arrow"></i>
+            </div>
+            <div class="swiper-button-next" id="main-slider__swiper-button-prev"><i class="organik-icon-right-arrow"></i></div>
+        </div>
+
+    </div>
+</section><!-- /.main-slider -->

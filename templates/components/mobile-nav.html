@@ -1,0 +1,54 @@
+{% load static %}
+
+<div class="mobile-nav__wrapper">
+    <div class="mobile-nav__overlay mobile-nav__toggler"></div>
+
+    <div class="mobile-nav__content">
+        <span class="mobile-nav__close mobile-nav__toggler"><i class="organik-icon-close"></i></span>
+
+        <div class="logo-box">
+            <a href="/" aria-label="logo image"><img src="{% static '/images/logo-light.png' %}" width="155" alt="" /></a>
+        </div>
+
+        <div class="mobile-nav__container"></div>
+
+        <ul class="mobile-nav__contact list-unstyled">
+            <li>
+                <i class="organik-icon-email"></i>
+                <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
+            </li>
+            <li>
+                <i class="organik-icon-calling"></i>
+                <a href="tel:{{contact.phone}}">{{ contact.phone }}</a>
+            </li>
+        </ul>
+
+        <div class="mobile-nav__top">
+
+            <!-- <div class="mobile-nav__language">
+                <img src="{% static '/images/resources/flag-1-1.jpg' %}" alt="">
+                <label class="sr-only" for="language-select">select language</label>
+                
+                <select class="selectpicker" id="language-select">
+                    <option value="english">English</option>
+                    <option value="arabic">Arabic</option>
+                </select>
+            </div> -->
+            
+            {% if request.user.is_authenticated %}
+                <div class="main-menu__user">
+                    <i class="organik-icon-user main-menu__user_item"></i>
+                    <a href="{% url 'logout' %}" class="user__toggler main-menu__user_item">{{ request.user.username }}</a>
+                </div>
+            {% else %}
+                <div class="main-menu__login">
+                    <i class="organik-icon-user main-menu__login_item"></i>
+                    <a href="#" class="login__toggler main-menu__login_item">Вход</a>
+                    <i class="main-menu__login_item">/</i>
+                    <a href="#" class="signup__toggler main-menu__login_item">Регистрация</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>

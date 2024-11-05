@@ -1,0 +1,96 @@
+{% load static %}
+
+<footer class="site-footer background-black-2">
+    <img src="{% static '/images/shapes/footer-bg-1-1.png' %}" alt="" class="site-footer__shape-1">
+    <img src="{% static '/images/shapes/footer-bg-1-2.png' %}" alt="" class="site-footer__shape-2">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                <div class="footer-widget footer-widget__about-widget">
+                    <a href="/" class="footer-widget__logo">
+                        <img src="{% static '/images/logo-main.png' %}" alt="" width="105">
+                    </a>
+                    <p class="thm-text-dark">{{ contact.name }}</p>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                <div class="footer-widget footer-widget__contact-widget">
+                    <h3 class="footer-widget__title">Контакты</h3>
+                    <ul class="list-unstyled footer-widget__contact">
+                        <li>
+                            <i class="fa fa-phone-square"></i>
+                            <a href="tel:{{contact.phone}}">{{ contact.phone }}</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-envelope"></i>
+                            <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-map-marker-alt"></i>
+                            <a href="javascript:void(0);">{{ contact.address }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-2">
+                <div class="footer-widget footer-widget__links-widget">
+                    <h3 class="footer-widget__title">Продажа</h3>
+                    <ul class="list-unstyled footer-widget__links">
+                        <li>
+                            <a href="{% url 'catalog:products' %}">Каталог</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'cart:cart_detail' %}">Корзина</a>
+                        </li>
+                        <li>
+                            <a href="/orders/checkout">Заказы</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-2">
+                <div class="footer-widget">
+                    <h3 class="footer-widget__title">Ссылки</h3>
+                    <ul class="list-unstyled footer-widget__links">
+                        <li>
+                            <a href="{% url 'enterprise:news' %}">Новости</a>
+                        </li>
+                        <li>
+                            <a href="/contact">Контакты</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-1" style="display: none;">
+                <div class="footer-widget">
+                    <h3 class="footer-widget__title">Новости</h3>
+                    <form action="#" data-url="YOUR_MAILCHIMP_URL" class="mc-form">
+                        <input type="email" name="EMAIL" id="mc-email" placeholder="Email Address">
+                        <button type="submit">Подписаться</button>
+                    </form>
+                    <div class="mc-form__response"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="bottom-footer">
+        <div class="container">
+            <hr>
+            <div class="inner-container text-center">
+                <div class="bottom-footer__social">
+                    <a href="{{ contact.vk }}" class="fab fa-vk"></a>
+                    <a href="{{ contact.fb }}" class="fab fa-facebook-square"></a>
+                    <a href="{{ contact.insta }}" class="fab fa-instagram"></a>
+                </div>
+                <p class="thm-text-dark">© Copyright <span class="dynamic-year"></span> by Julia.Kendo</p>
+            </div>
+        </div>
+    </div>
+</footer>

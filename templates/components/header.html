@@ -1,0 +1,97 @@
+{% load static %}
+
+<header class="main-header">
+    <div class="topbar">
+        <div class="container">
+            <div class="main-logo">
+                <a href="/" class="logo">
+                    <img src="{% static '/images/logo-main.png' %}" width="105" alt="">
+                </a>
+                <div class="mobile-nav__buttons">
+                    <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
+                    <a href="javascript:void(0);" class="mini-cart__toggler"><i class="organik-icon-shopping-cart"></i></a>
+                </div>
+
+                <span class="fa fa-bars mobile-nav__toggler"></span>
+            </div>
+
+            <div class="topbar__left">
+                <div class="topbar__social">
+                    <a href="{{ contact.vk }}" class="fab fa-vk"></a>
+                    <a href="{{ contact.fb }}" class="fab fa-facebook-square"></a>
+                    <a href="{{ contact.insta }}" class="fab fa-instagram"></a>
+                </div>
+                <div class="topbar__info">
+                    <i class="organik-icon-email"></i>
+                    <p>Email <a href="mailto:{{contact.email}}">{{ contact.email }}</a></p>
+                </div>
+            </div>
+
+            <div class="topbar__right">
+                <div class="topbar__info">
+                    <i class="organik-icon-calling"></i>
+                    <p>Телефон <a href="tel:{{contact.phone}}">{{ contact.phone }}</a></p>
+                </div>
+                <div class="topbar__buttons">
+                    <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
+                    <a href="javascript:void(0);" class="mini-cart__toggler">
+                        <i class="organik-icon-shopping-cart"></i>
+                        {% with total_items=cart|length %}
+                            {% if cart|length > 0 %}
+                                <span class="cart-count">{{ total_items }}</span>
+                            {% else %}
+                                <span class="cart-count" style="display: none;"></span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <nav class="main-menu">
+        <div class="container">
+            {% if request.user.is_authenticated %}
+                <div class="main-menu__user">
+                    <i class="organik-icon-user main-menu__user_item"></i>
+                    <a href="{% url 'logout' %}" class="user__toggler main-menu__user_item">{{ request.user.username }}</a>
+                </div>
+            {% else %}
+                <div class="main-menu__login">
+                    <i class="organik-icon-user main-menu__login_item"></i>
+                    <a href="javascript:void(0);" class="login__toggler main-menu__login_item">Вход</a>
+                    <i class="main-menu__login_item">/</i>
+                    <a href="javascript:void(0);" class="signup__toggler main-menu__login_item">Регистрация</a>
+                </div>
+            {% endif %}
+
+            <ul class="main-menu__list">
+                <li class="dropdown">
+                    <a href="/">Главная</a>
+                </li>
+                <li>
+                    <a href="{% url 'enterprise:news' %}">Новости</a>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0);">Каталог</a>
+                    <ul>
+                        <li><a href="{% url 'catalog:products' %}">Каталог</a></li>
+                        <li><a href="{% url 'cart:cart_detail' %}">Корзина</a></li>
+                        <li><a href="/orders/checkout">Заказы</a></li>
+                    </ul>
+                </li>
+                <li><a href="/contact">Контакты</a></li>
+            </ul>
+            <!-- <div class="main-menu__language">
+                <img src="{% static '/images/resources/flag-1-1.jpg' %}" alt="">
+                <label class="sr-only" for="language-select">Язык</label>
+                <select class="selectpicker" id="language-select-header">
+                    <option value="english">Английский</option>
+                    <option value="arabic">Русский</option>
+                </select>
+            </div> -->
+        </div>
+    </nav>
+
+</header>
