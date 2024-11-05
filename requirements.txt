@@ -7,3 +7,4 @@ djangorestframework==3.14.0
 Pillow==9.5.0
 django-filter==23.2
 more-itertools==9.1.0
+requests==2.31.0
