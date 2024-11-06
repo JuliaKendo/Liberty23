@@ -6,7 +6,13 @@ class DynamicCsrfTrustedOriginsMiddleware:
 
     def __call__(self, request):
         host = f"{request.scheme}://{request.get_host()}"
+
+        forwarded_host = request.headers.get('X-Forwarded-Host')
+        if forwarded_host:
+            host = f"{request.scheme}://{forwarded_host}"
+
         if host not in settings.CSRF_TRUSTED_ORIGINS:
             settings.CSRF_TRUSTED_ORIGINS.append(host)
         response = self.get_response(request)
+
         return response
