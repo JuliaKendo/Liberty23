@@ -9,7 +9,7 @@ class DynamicCsrfTrustedOriginsMiddleware:
 
         forwarded_host = request.headers.get('X-Forwarded-Host')
         if forwarded_host:
-            host = f"{request.scheme}://{forwarded_host}"
+            host = f"{request.scheme}://{forwarded_host}:6679"
 
         if host not in settings.CSRF_TRUSTED_ORIGINS:
             settings.CSRF_TRUSTED_ORIGINS.append(host)
