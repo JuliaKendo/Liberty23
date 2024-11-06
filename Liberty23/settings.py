@@ -35,7 +35,7 @@ DEBUG = env.bool('DEBUG', True)
 # ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
-CSRF_TRUSTED_ORIGINS = ['http://', 'https://']
+# CSRF_TRUSTED_ORIGINS = ['http://', 'https://']
 LOG_ENV = env('LOG_ENV', 'development' if DEBUG else 'production')
 
 # Application definition
@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'Liberty23.middleware.dynamic_csrf.DynamicCsrfTrustedOriginsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -163,8 +164,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Static & media
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),]
-if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 MEDIA_URL = 'media/'
