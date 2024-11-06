@@ -11,3 +11,5 @@ requests==2.31.0
 gunicorn==20.1.0
 psycopg2-binary==2.9.6
 django-summernote==0.8.20.0
+six==1.16.0
+djangorestframework-recursive==0.1.2
