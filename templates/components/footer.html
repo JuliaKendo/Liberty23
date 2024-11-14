@@ -37,18 +37,20 @@
 
             <div class="col-sm-12 col-md-6 col-lg-6 col-xl-2">
                 <div class="footer-widget footer-widget__links-widget">
-                    <h3 class="footer-widget__title">Продажа</h3>
-                    <ul class="list-unstyled footer-widget__links">
-                        <li>
-                            <a href="{% url 'catalog:products' %}">Каталог</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'cart:cart_detail' %}">Корзина</a>
-                        </li>
-                        <li>
-                            <a href="/orders/checkout">Заказы</a>
-                        </li>
-                    </ul>
+                    {% if department.name %}
+                        <h3 class="footer-widget__title">Продажа</h3>
+                        <ul class="list-unstyled footer-widget__links">
+                            <li>
+                                <a href="{% url 'catalog:products' %}">Каталог</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'cart:cart_detail' %}">Корзина</a>
+                            </li>
+                            <li>
+                                <a href="/orders/checkout">Заказы</a>
+                            </li>
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         

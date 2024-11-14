@@ -82,3 +82,15 @@ class News(models.Model):
     @property
     def get_image(self):
         return self.picture.url
+
+
+class Department(models.Model):
+    name = models.CharField('Наименование', max_length=200, db_index=True)
+    identifier_1C = models.CharField('Идентификатор 1С', max_length=50, blank=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Подразделение'
+        verbose_name_plural = 'Подразделения'
+
+    def __str__(self):
+        return self.name

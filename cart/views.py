@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from .cart import Cart
 from .forms import CartAddProductForm
 from catalog.models import Product
+from prices.lib import get_delivery_price
 
 
 @require_POST
@@ -47,7 +48,13 @@ def cart_remove(request, product_id):
 
 def cart_detail(request):
     cart = Cart(request)
-    return render(request, 'cart.html', {'cart': cart})
+    return render(
+        request,
+        'cart.html',
+        {
+            'cart': cart,
+            'delivery_price': get_delivery_price(request)
+    })
 
 
 def mini_cart_detail(request):

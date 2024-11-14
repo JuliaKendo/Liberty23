@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Price, PriceType
+from .models import Price, PriceType, DeliveryPrice
 
 
 @admin.register(PriceType)
@@ -41,6 +41,31 @@ class PriceAdmin(admin.ModelAdmin):
     list_filter = [
         'type',
         'product',
+    ]
+    readonly_fields = [
+        'start_at',
+    ]
+
+    list_display_links = fields
+
+
+@admin.register(DeliveryPrice)
+class DeliveryPriceAdmin(admin.ModelAdmin):
+    search_fields = ['department__name',]
+    list_display = [
+        'department',
+        'price',
+        'start_at',
+        'end_at',
+    ]
+    fields = [
+        'department',
+        'price',
+        'start_at',
+        'end_at',
+    ]
+    list_filter = [
+        'department',
     ]
     readonly_fields = [
         'start_at',

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load humanize %}
 {% block page %}
 
 <div class="stricky-header stricked-menu main-menu">
@@ -142,17 +143,23 @@
 					</div>
 					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
 					{% for cart_item in cart %}
-					{% with product=cart_item.product %}
-						<p>
-							<span>{{ product.name }}</span>
-							{% if cart_item.total_price %}
-								<span>{{ cart_item.total_price }} руб.</span>
-                            {% else %}
-								<span>0,00 руб.</span>
-                            {% endif %}
-						</p>
-					{% endwith %}
+						{% with product=cart_item.product %}
+							<p>
+								<span>{{ product.name }}</span>
+								{% if cart_item.total_price %}
+									<span>{{ cart_item.total_price|floatformat:2|intcomma }} руб.</span>
+								{% else %}
+									<span>0,00 руб.</span>
+								{% endif %}
+							</p>
+						{% endwith %}
 					{% endfor %}
+					{% if delivery_price %}
+						<p>
+							<span>Доставка</span>
+							<span>{{ delivery_price|floatformat:2|intcomma }} руб.</span>
+						</p>
+					{% endif %}
 				</div>
 			</div>
 			<div class="col-md-6">

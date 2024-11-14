@@ -46,6 +46,7 @@ class OrderAdmin(admin.ModelAdmin):
         'id',
         'created_at',
         'status',
+        'department',
         'customer',
         'delivery_address',
         'order_sum',
@@ -55,6 +56,7 @@ class OrderAdmin(admin.ModelAdmin):
     fields = [
         'created_at',
         'status',
+        'department',
         'customer',
         'delivery_address',
         'additional_info',

@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.contrib.auth.models import User
+from enterprise.models import Department
 from catalog.models import Product
 from prices.models import PriceType
 
@@ -70,6 +71,15 @@ class Order(models.Model):
     )
     identifier_1C = models.CharField(
         'Идентификатор 1С', max_length=50, blank=True, db_index=True
+    )
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        verbose_name='Подразделение',
+        related_name='department_oders',
+        blank=True,
+        null=True,
+        db_index=True,
     )
 
     class Meta:

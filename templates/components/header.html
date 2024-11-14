@@ -57,6 +57,9 @@
                     <i class="organik-icon-user main-menu__user_item"></i>
                     <a href="{% url 'logout' %}" class="user__toggler main-menu__user_item">{{ request.user.username }}</a>
                 </div>
+                <div class="main-menu__department">
+                    <a href="javascript:void(0);" name="make-order" class="make-order" data-url="{% url 'enterprise:departments' %}">{{ department.name }}</a>
+                </div>
             {% else %}
                 <div class="main-menu__login">
                     <i class="organik-icon-user main-menu__login_item"></i>
@@ -73,14 +76,16 @@
                 <li>
                     <a href="{% url 'enterprise:news' %}">Новости</a>
                 </li>
-                <li class="dropdown">
-                    <a href="javascript:void(0);">Каталог</a>
-                    <ul>
-                        <li><a href="{% url 'catalog:products' %}">Каталог</a></li>
-                        <li><a href="{% url 'cart:cart_detail' %}">Корзина</a></li>
-                        <li><a href="/orders/checkout">Заказы</a></li>
-                    </ul>
-                </li>
+                {% if department.name %}
+                    <li class="dropdown">
+                        <a href="javascript:void(0);">Каталог</a>
+                        <ul>
+                            <li><a href="{% url 'catalog:products' %}">Каталог</a></li>
+                            <li><a href="{% url 'cart:cart_detail' %}">Корзина</a></li>
+                            <li><a href="/orders/checkout">Заказы</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
                 <li><a href="/contact">Контакты</a></li>
             </ul>
             <!-- <div class="main-menu__language">

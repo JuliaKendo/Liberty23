@@ -2,7 +2,19 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django_summernote.admin import SummernoteModelAdmin
 
-from .models import Contacts, News
+from .models import Contacts, News, Department
+from prices.models import DeliveryPrice
+
+
+class DeliveryPriceInLine(admin.TabularInline):
+    model = DeliveryPrice
+    extra = 0
+    fields = ('department', 'price', 'start_at', 'end_at')
+    readonly_fields = ('start_at',)
+    classes = ('collapse', )
+
+    verbose_name = 'Цена доставки'
+    verbose_name_plural = 'Цены доставки'
 
 
 @admin.register(Contacts)
@@ -49,3 +61,12 @@ class NewsAdmin(SummernoteModelAdmin):
 
     render_preview.short_description = 'Preview'
 
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    search_fields = ['name',]
+    list_display = ['name',]
+    fields = ['name',]
+    list_display_links = list_display
+
+    inlines = [DeliveryPriceInLine,]

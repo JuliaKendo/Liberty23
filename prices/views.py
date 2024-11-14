@@ -5,8 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, ListSerializer
 
-from .models import Price, PriceType
+from .models import Price, PriceType, DeliveryPrice 
 from catalog.models import Product
+from enterprise.models import Department
 from catalog.views import CategorySerializer
 from catalog.views import get_or_update_product
 
@@ -62,10 +63,55 @@ class PriceSerializer(ModelSerializer):
         list_serializer_class = PriceListSerializer
 
 
+class DepartmentSerializer(ModelSerializer):
+    
+    class Meta:
+        model = Department
+        fields = '__all__'
+
+
+class DeliveryPriceListSerializer(ListSerializer):
+
+    def update(self, _, validated_data):
+        ret = []
+        for item in validated_data:
+            serializer = DepartmentSerializer(data=item.pop('department'))
+            if serializer.is_valid():
+                department = serializer.save()
+                price_entry, _ = DeliveryPrice.objects.update_or_create(
+                    start_at = item.pop('start_at', timezone.now()),
+                    department = department,
+                    defaults = item
+                )
+                ret.append(price_entry)
+
+        return ret
+
+
+class DeliveryPriceSerializer(ModelSerializer):
+    
+    department = DepartmentSerializer()
+
+    class Meta:
+        model = DeliveryPrice
+        fields = '__all__'
+        list_serializer_class = DeliveryPriceListSerializer
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_price(request):
     serializer = PriceSerializer(instance='', data=request.data, many=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response('success upload', status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_delivery_price(request):
+    serializer = DeliveryPriceSerializer(instance='', data=request.data, many=True)
     if serializer.is_valid():
         serializer.save()
         return Response('success upload', status=status.HTTP_201_CREATED)

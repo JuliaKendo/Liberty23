@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -87,6 +88,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'enterprise.context_processors.contact',
+                'enterprise.context_processors.department',
                 'cart.context_processors.cart',
             ],
             'libraries': {
@@ -180,6 +182,7 @@ REST_FRAMEWORK = {
 
 
 CART_SESSION_ID = 'cart'
+DEPARTMENT_SESSION_ID = 'department'
 
 # Summernote settings
 X_FRAME_OPTIONS = 'SAMEORIGIN'

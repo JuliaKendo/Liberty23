@@ -21,6 +21,9 @@ from cart.cart import Cart
 from catalog.models import Product
 from prices.models import PriceType
 from Liberty23.forms import SignUpForm
+from prices.lib import get_delivery_price
+from enterprise.models import Department
+from enterprise.departments import СurrentDepartment
 
 
 class CartIsEmpty(Exception):
@@ -81,10 +84,18 @@ class DeliveryAddressSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class DepartmentSerializer(ModelSerializer):
+
+    class Meta:
+        model = Department
+        fields = '__all__'
+
+
 class OrderSerializer(ModelSerializer):
 
     customer = UserSerializer()
     delivery_address = DeliveryAddressSerializer()
+    department = DepartmentSerializer()
 
     class Meta:
         model = Order
@@ -97,8 +108,10 @@ class CheckoutView(TemplateView):
     def get_context_data(self, **kwargs): 
         context = super().get_context_data(**kwargs)
         context['delivery_addresses'] = DeliveryAddresses.objects.none()
+        context['delivery_price'] = 0
         if self.request.user.is_authenticated:
             context['delivery_addresses'] = DeliveryAddresses.objects.filter(customer=self.request.user).order_by('-created_at')
+            context['delivery_price'] = get_delivery_price(self.request)
         return context
 
 
@@ -129,6 +142,7 @@ def create_user_and_login(request, param):
 def order_add(request):
     user = request.user
     cart = Cart(request)
+    departments = СurrentDepartment(request)
     create_account = request.POST.get('createAccount', '') == 'on' \
         and not request.user.is_authenticated
     delivery_addresses_form = DeliveryAddressesForm(request.POST)
@@ -150,6 +164,7 @@ def order_add(request):
                     'status': 'introductory',
                     'delivery_address': delivery_addresses_instance,
                     'additional_info': request.POST.get('additional_info', ''),
+                    'department': departments.department
                 })
                 if order_form.is_valid():
                     errors = []

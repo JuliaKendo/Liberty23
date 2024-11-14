@@ -402,10 +402,11 @@
   if ($(".login-form").length) {
     $(".login-form").on("click", function (e) {
       e.preventDefault();
-      if ($(e.target).parents().closest('form').html()) return;
-      $(".login-form").toggleClass("shown");
-      $('.mobile-nav__wrapper').removeClass('shown');
-      $("body").toggleClass("locked");
+      // Скрывать форму по клику в любом месте экрана
+      // if ($(e.target).parents().closest('form').html()) return;
+      // $(".login-form").toggleClass("shown");
+      // $('.mobile-nav__wrapper').removeClass('shown');
+      // $("body").toggleClass("locked");
     });
   }
   if ($("a[name='add-to-cart']").length) {
@@ -504,6 +505,42 @@
 
     });
   }
+  if ($("a[name='make-order']").length) {
+    $("a[name='make-order']").on("click", function (e) {
+      e.preventDefault();
+      const $url = $(e.currentTarget).data('url');
+      if (!$url) return;
+
+      $.ajax({
+        url: $url,
+        success: (response) => {
+          const selectDepartmentsForm = $(".select-departments-form");
+          selectDepartmentsForm.html(response);
+
+          // Отобразить форму с возможностью закрытия по клику в любом месте экрана:
+          // selectDepartmentsForm.toggleClass("shown");
+          // $('.mobile-nav__wrapper').removeClass('shown');
+          // $("body").toggleClass("locked");
+
+          // Отобразить форму с возможностью закрытия только по клику на крестик:
+          selectDepartmentsForm.addClass("shown");
+          $('.mobile-nav__wrapper').removeClass('shown');
+          $("body").addClass("locked");
+
+          // Закрываем форму по клику на крестик:
+          $(".select-departments-form i.organik-icon-close").click(e => {
+            e.preventDefault();
+            selectDepartmentsForm.removeClass("shown");
+            $('.mobile-nav__wrapper').addClass('shown');
+            $("body").removeClass("locked");
+          });
+
+        }
+      });
+
+    });
+  }
+
   function isEmpty(obj) {
     return Object.keys(obj).length === 0;
   }
@@ -580,9 +617,16 @@
       success: (response) => {
         const loginForm = $(".login-form");
         loginForm.html(response);
-        loginForm.toggleClass("shown");
+
+        // Отобразить форму с возможностью закрытия по клику в любом месте экрана:
+        // loginForm.toggleClass("shown");
+        // $("body").toggleClass("locked");
+
+        // Отобразить форму с возможностью закрытия только по клику на крестик:
+        loginForm.addClass("shown");
         $('.mobile-nav__wrapper').removeClass('shown');
-        $("body").toggleClass("locked");
+        $("body").addClass("locked");
+
         eventLoginForm();
       }
     });
@@ -604,9 +648,10 @@
             if ('is_authenticated' in response && response.is_authenticated) {
               location.reload();
             } else {
-              loginForm.toggleClass("shown");
-              $('.mobile-nav__wrapper').removeClass('shown');
-              $("body").toggleClass("locked");
+              // Скрывать форму:
+              // loginForm.toggleClass("shown");
+              // $('.mobile-nav__wrapper').removeClass('shown');
+              // $("body").toggleClass("locked");
             }
           }
         },
@@ -614,6 +659,14 @@
           console.log(errors);
         }
       });
+    });
+    // Закрываем форму по клику на крестик:
+    $(".login-form i.organik-icon-close").click(e => {
+      e.preventDefault();
+      const loginForm = $(".login-form");
+      loginForm.removeClass("shown");
+      $('.mobile-nav__wrapper').addClass('shown');
+      $("body").removeClass("locked");
     });
 
   }
@@ -674,7 +727,6 @@
       }
     });
     $(".add").on("click", function () {
-      console.log('1 ', +$(this).prev().val());
       if ($(this).prev().val() < 999) {
         $(this)
           .prev()
@@ -697,7 +749,6 @@
         $(e.currentTarget).parents('.quantity-box').find('form[name="cart-form"] > input').each((_, el)=>{
           if (el.name == 'quantity') $(el).val(quantity);
           if (el.name == 'update') $(el).val(0);
-          console.log($(el).val());
         });
         handleCartItems($(e.currentTarget));
       }

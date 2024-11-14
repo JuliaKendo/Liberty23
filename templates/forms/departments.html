@@ -1,0 +1,19 @@
+<div class="department__overlay department__toggler"></div>
+<div class="department__content">
+    <div class="department__top">
+        <h3 class="department__title">Подразделения</h3>
+        <span class="department__close department__toggler"><i class="organik-icon-close"></i></span>
+    </div>
+
+    <form id="department-form" method="post" action="{% url 'enterprise:departments' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!-- <div>
+            {% if errors %}
+                <div class="text-error">{{ errors }}</div>
+            {% endif %}
+        </div> -->
+        <button type="submit" class="thm-btn" style="margin-top: 100px;">Выбрать</button>
+    </form>
+
+</div>

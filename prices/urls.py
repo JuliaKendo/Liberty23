@@ -6,4 +6,5 @@ app_name = "prices"
 
 urlpatterns = [
     path('upload', views.upload_price),
+    path('upload/delivery', views.upload_delivery_price),        
 ]

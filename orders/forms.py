@@ -28,7 +28,7 @@ class DeliveryAddressesForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['customer', 'status', 'delivery_address', 'additional_info',]
+        fields = ['customer', 'status', 'delivery_address', 'additional_info', 'department', ]
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
