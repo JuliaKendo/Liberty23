@@ -22,9 +22,9 @@ class DepartmentListSerializer(ListSerializer):
     def update(self, instance, validated_data):
         ret = []
         for item in validated_data:   
-            department, _ = Department.objects.update_or_create(
+            department, _ = Department.objects.get_or_create(
                 identifier_1C=item.pop('identifier_1C', ''),
-                defaults = item
+                defaults=item
             )
             ret.append(department)
         return ret
@@ -85,10 +85,7 @@ def departments(request):
         form = DepartmentsForm(request.POST)
         if form.is_valid():
             with suppress(Department.DoesNotExist): 
-                department.update(
-                    Department.objects.get(
-                        id=form.cleaned_data.get('departments')
-                ))
+                department.update(form.cleaned_data.get('departments'))
         return redirect("/catalog/products")
     else:
         form = DepartmentsForm()

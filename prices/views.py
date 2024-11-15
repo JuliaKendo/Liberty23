@@ -69,6 +69,13 @@ class DepartmentSerializer(ModelSerializer):
         model = Department
         fields = '__all__'
 
+    def create(self, validated_data):
+        department, _ = Department.objects.get_or_create(
+            identifier_1C=validated_data['identifier_1C'],
+            defaults=validated_data
+        )
+        return department
+
 
 class DeliveryPriceListSerializer(ListSerializer):
 
