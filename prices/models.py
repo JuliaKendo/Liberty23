@@ -96,7 +96,7 @@ class DeliveryPriceQuerySet(models.QuerySet):
     def available_delivery_price(self, department):
         with suppress(PriceType.DoesNotExist): 
             return self.distinct().filter(
-                id=department.id,
+                department_id=department.id,
                 start_at__lte=timezone.now()
             ).filter(
                 Q(end_at__isnull=True) | Q(end_at__gte=timezone.now())
