@@ -22,10 +22,15 @@ urlpatterns = [
     # re_path(r'^$', views.orders, name='all'),
     
     path('checkout', views.CheckoutView.as_view(), name='checkout'),
+    path('pre-order', views.PreOrderView.as_view(), name='pre-order'),
     re_path(r'^add/$', views.order_add, name='add'),
+    re_path(r'^remove/$', views.order_remove, name='remove'),
     re_path(r'^remove/(?P<order_id>\d+)/$', views.order_remove, name='remove'),
+    re_path(r'^/check/$', views.order_add, name='add'),
 
     path('export', views.unload_orders),
     path('export/<data:data_from>', views.unload_orders),
     path('export/<data:data_from>/<data:data_to>', views.unload_orders),
+
+    path('payment', views.result_payment, name='payment'),
 ]

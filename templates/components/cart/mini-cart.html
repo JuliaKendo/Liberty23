@@ -44,6 +44,6 @@
             {% endwith %}
         {% endfor %}
 
-        <a href="/orders/checkout" class="thm-btn mini-cart__checkout">Заказать</a>
+        <a href="{% url  'orders:pre-order' %}" class="thm-btn mini-cart__checkout">Заказать</a>
     </div>
 </div>

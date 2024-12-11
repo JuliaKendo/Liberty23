@@ -1,8 +1,9 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from django_summernote.admin import SummernoteModelAdmin
 
-from .models import Contacts, News, Department
+from .models import Contacts, News, Department, PaymentSetup
 from prices.models import DeliveryPrice
 
 
@@ -70,3 +71,28 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display_links = list_display
 
     inlines = [DeliveryPriceInLine,]
+
+
+class PasswordInputForm(forms.ModelForm):
+    class Meta:
+        model = PaymentSetup
+        fields = '__all__'
+        widgets = {
+            'password1': forms.PasswordInput(),
+            'password2': forms.PasswordInput(),
+        }
+
+
+@admin.register(PaymentSetup)
+class PaymentSetupAdmin(admin.ModelAdmin):
+    form = PasswordInputForm
+
+    search_fields = []
+    list_display = ['name', 'merchant_login',]
+    fields = [
+        'name',
+        'merchant_login',
+        ('password1', 'password2'),
+        'is_test',
+    ]
+    list_display_links = list_display

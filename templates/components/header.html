@@ -82,7 +82,7 @@
                         <ul>
                             <li><a href="{% url 'catalog:products' %}">Каталог</a></li>
                             <li><a href="{% url 'cart:cart_detail' %}">Корзина</a></li>
-                            <li><a href="/orders/checkout">Заказы</a></li>
+                            <li><a href="{% url 'orders:checkout' %}">Заказы</a></li>
                         </ul>
                     </li>
                 {% endif %}

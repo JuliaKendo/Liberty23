@@ -142,19 +142,19 @@
 						<p>Стоимость</p>
 					</div>
 					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
-					{% for cart_item in cart %}
+					{% for cart_item in basket %}
 						{% with product=cart_item.product %}
 							<p>
 								<span>{{ product.name }}</span>
-								{% if cart_item.total_price %}
-									<span>{{ cart_item.total_price|floatformat:2|intcomma }} руб.</span>
+								{% if cart_item.sum %}
+									<span>{{ cart_item.sum|floatformat:2|intcomma }} руб.</span>
 								{% else %}
 									<span>0,00 руб.</span>
 								{% endif %}
 							</p>
 						{% endwith %}
 					{% endfor %}
-					{% if delivery_price %}
+					{% if delivery_price and basket %}
 						<p>
 							<span>Доставка</span>
 							<span>{{ delivery_price|floatformat:2|intcomma }} руб.</span>
@@ -166,34 +166,39 @@
 				<div class="order-payment">
 					<ul id="accordion" class="list-unstyled" data-wow-duration="1500ms">
 						<li>
-							<h2 class="para-title active">
+							<h2 name="para-title-order" class="para-title active">
 								<span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-									Direct Bank Transfer
+									Заказать без оплаты
 								</span>
 							</h2>
 							<div id="collapseTwo" class="collapse show" role="button" aria-labelledby="collapseTwo" data-parent="#accordion">
-								<p>Make your payment directly into our bank account. Please
-									use your Order ID as the payment reference. Your order
-									wont be shipped until the funds have cleared.</p>
+								<p>Будет сформирован счет на оплату и отправлен на указанную электронную почту.</p>
 							</div>
 						</li>
 						<li>
-							<h2 class="para-title ">
+							<h2 name="para-title-payment" class="para-title ">
 								<span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-									Paypal Payment
-									<img src="{% static '/images/products/paypal-1-1.jpg' %}" alt="">
+									Оплатить и заказать
+									<img src="{% static '/images/resources/robokassa.png' %}" alt="" style="height: 10px; margin-top: 5px;">
 								</span>
 							</h2>
 							<div id="collapseOne" class="collapse " aria-labelledby="collapseOne" data-parent="#accordion">
-								<p>Make your payment directly into our bank account. Please
-									use your Order ID as the payment reference. Your order
-									wont be shipped until the funds have cleared.</p>
+								<p></p>
 							</div>
 						</li>
 					</ul>
 				</div>
 				<div class="text-right">
-					<a href="javascript:void(0);" class="thm-btn" id="submit-order" data-url="{% url 'catalog:products' %}">Заказать</a>
+					<form id="payment-form" method="post" action="#" visibility="hidden">
+						{% with cart_item=basket|first %}
+							{% with sum=cart_item.sum__sum|add:delivery_price %}
+								<input type="hidden" name="OutSum" value="{{ sum|floatformat:2 }}" />
+							{% endwith %}
+						{% endwith %}
+						<input type="hidden" name="Culture" value="ru" />
+						<input type="hidden" name="Encoding" value="utf-8" />
+					  </form>
+					<a href="javascript:void(0);" class="thm-btn" id="submit-order" data-url="{% url 'catalog:products' %}" visibility="visibility">Заказать</a>
 				</div>
 			</div>
 		</div>

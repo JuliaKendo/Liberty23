@@ -94,3 +94,18 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class PaymentSetup(SingletonModel):
+    name = models.CharField('Интегратор', max_length=200, db_index=True)
+    merchant_login = models.CharField('Наименование магазина', max_length=200, db_index=True)
+    password1 = models.CharField(max_length=128, verbose_name='Пароль #1')
+    password2 = models.CharField(max_length=128, verbose_name='Пароль #2')
+    is_test = models.BooleanField('Тестовое подключение', default=False)
+
+    class Meta:
+        verbose_name = 'Настройка платежей'
+        verbose_name_plural = 'Настройка платежей'
+
+    def __str__(self):
+        return f'{self.name}: {self.merchant_login}'

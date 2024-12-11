@@ -4,10 +4,11 @@ from random import choice
 from string import digits, ascii_letters
 
 from django.db import transaction
-from django.http import JsonResponse
+from django.db.models import Sum
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
@@ -18,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import DeliveryAddresses, Order, OrderItem
 from .forms import OrderForm, OrderItemForm, DeliveryAddressesForm
 from cart.cart import Cart
+from cart.models import Basket
 from catalog.models import Product
 from prices.models import PriceType
 from Liberty23.forms import SignUpForm
@@ -112,6 +114,50 @@ class CheckoutView(TemplateView):
         if self.request.user.is_authenticated:
             context['delivery_addresses'] = DeliveryAddresses.objects.filter(customer=self.request.user).order_by('-created_at')
             context['delivery_price'] = get_delivery_price(self.request)
+
+        return context
+
+
+class PreOrderView(CheckoutView):
+    template_name = 'checkout.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        basket = []
+        user = request.user
+        cart = Cart(request)
+        try:
+            with transaction.atomic():
+                for item in cart:
+                    product = get_object_or_404(Product, pk=item['product']['id'])
+                    basket.append(
+                        Basket(
+                            user=user,
+                            product=product,
+                            unit=product.unit,
+                            quantity=item['quantity'],
+                            price=item['price'],
+                            sum=item['total_price'])
+                    )
+            if basket:
+                Basket.objects.bulk_create(basket)
+        except Exception:
+            transaction.rollback()
+        else:
+            cart.clear()
+        finally:
+            if transaction.get_autocommit():
+                transaction.commit()
+
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs): 
+        context = super().get_context_data(**kwargs)
+        context['basket'] = []
+    
+        user = self.request.user
+        if user:
+            context['basket'] = Basket.objects.filter(user=user).annotate(sum__sum=Sum('sum'))
+
         return context
 
 
@@ -141,7 +187,7 @@ def create_user_and_login(request, param):
 @require_POST
 def order_add(request):
     user = request.user
-    cart = Cart(request)
+    cart = Basket.objects.filter(user=user)
     departments = СurrentDepartment(request)
     create_account = request.POST.get('createAccount', '') == 'on' \
         and not request.user.is_authenticated
@@ -161,7 +207,7 @@ def order_add(request):
                 delivery_addresses_instance.save()
                 order_form = OrderForm({
                     'customer': user,
-                    'status': 'introductory',
+                    'status': request.POST.get('status', 'introductory'),
                     'delivery_address': delivery_addresses_instance,
                     'additional_info': request.POST.get('additional_info', ''),
                     'department': departments.department
@@ -171,13 +217,12 @@ def order_add(request):
                     order_instance = order_form.save(commit=False)
                     order_instance.save()
                     for item in cart:
-                        product = Product.objects.get(pk=item['product']['id'])
                         item_form = OrderItemForm({
-                            'product': product,
-                            'unit': product.unit,
-                            'quantity': item['quantity'],
-                            'price': item['price'],
-                            'sum': item['total_price']
+                            'product': item.product,
+                            'unit': item.unit,
+                            'quantity': item.quantity,
+                            'price': item.price,
+                            'sum': item.sum
                         })
                         if item_form.is_valid():
                             item_instance = item_form.save(commit=False)
@@ -211,18 +256,66 @@ def order_add(request):
         return JsonResponse(
             {'cartIsEmpty': ['В корзине отсутствуют товары для заказа']},
             safe=False
-        )       
+        )
+
+    else:
+        cart.delete()
 
     finally:
         if transaction.get_autocommit():
             transaction.commit()
-            cart.clear()
 
-    return JsonResponse({}, status=200)
+    return JsonResponse({'InvId': order_instance.id}, status=200)
 
 
-@require_POST
-def order_remove(request, order_id):...
+@require_GET
+def order_remove(request, order_id=None):
+    def get_last_order_id():
+        last_order = Order.objects.filter(
+            customer= request.user,
+            status='introductory'
+        ).order_by('-created_at').first()
+        if last_order: 
+            return last_order.id
+
+    if not order_id:
+        order_id = get_last_order_id()
+
+    if order_id:
+        basket = []
+        order = get_object_or_404(Order, pk=order_id)
+        order_items = OrderItem.objects.filter(order=order)
+        for order_item in order_items:
+            basket.append(
+                Basket(
+                    user=request.user,
+                    product=order_item.product,
+                    unit=order_item.unit,
+                    quantity=order_item.quantity,
+                    price=order_item.price,
+                    sum=order_item.sum
+            ))
+        try:
+            with transaction.atomic(): 
+                Order.objects.filter(pk=order_id).delete()
+                if order.status == 'introductory':
+                    Basket.objects.bulk_create(basket)
+        finally:
+            if transaction.get_autocommit():
+                transaction.commit()
+
+    return redirect('orders:pre-order')
+
+
+@require_GET
+def result_payment(request, *args, **kwargs):
+    result = request.GET.dict()
+    if result and result.get('InvId') and result.get('IncSum'):
+        order = get_object_or_404(Order, pk=result.get('InvId'))
+        order.status = 'paid'
+        order.save()
+        return redirect('catalog:products')
+    return redirect('orders:pre-order')
 
 
 @api_view(['GET'])
@@ -243,3 +336,4 @@ def unload_orders(request, *args, **kwargs):
         serialized_orders.append(serialized_order)
 
     return JsonResponse(serialized_orders, status=200, safe=False)
+ 

@@ -1,6 +1,9 @@
+import hashlib
+import requests
 from contextlib import suppress
 from django.shortcuts import render, redirect
 from django.conf import settings
+from django.http import JsonResponse
 from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
@@ -12,7 +15,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, ListSerializer
 
-from .models import News, Department
+from requests.exceptions import HTTPError, ConnectionError
+import xml.etree.ElementTree as ET
+
+from .models import News, Department, PaymentSetup
 from .forms import DepartmentsForm
 from .departments import СurrentDepartment
 
@@ -36,6 +42,13 @@ class DepartmentSerializer(ModelSerializer):
         model = Department
         fields = '__all__'
         list_serializer_class = DepartmentListSerializer
+
+
+class PaymentSetupSerializer(ModelSerializer):
+
+    class Meta:
+        model = PaymentSetup
+        fields = '__all__'
 
 
 class NewsView(ListView):
@@ -90,3 +103,70 @@ def departments(request):
     else:
         form = DepartmentsForm()
     return render(request, 'forms/departments.html', {'form': form})
+
+
+@api_view(['POST'])
+def get_payment_params(request, *args, **kwargs):
+
+    def calculate_signature(*args):
+        """Create signature MD5.
+        """
+        return hashlib.md5(':'.join(str(arg) for arg in args).encode()).hexdigest()
+    
+    payment_params = PaymentSetupSerializer(PaymentSetup.objects.first()).data
+    result = {key:value.replace(',','.') if key=='OutSum' else value for key, value in request.POST.dict().items()} | {
+        'MerchantLogin': payment_params.get('merchant_login')
+    }
+    result = result | {
+        'SignatureValue': calculate_signature(
+            result['MerchantLogin'], result['OutSum'],
+            result['InvId'], payment_params['password1']
+        )
+    }
+    if payment_params.get('is_test'):
+        result = result | {'IsTest': '1'}
+
+    return JsonResponse(result, status=200, safe=False)
+
+
+@api_view(['POST'])
+def check_payment(request, *args, **kwargs):
+    def calculate_signature(*args):
+        """Create signature MD5.
+        """
+        return hashlib.md5(':'.join(str(arg) for arg in args).encode()).hexdigest()
+
+    payment_status = {'status': 0}
+    params = request.POST.dict()
+    payment_params = PaymentSetupSerializer(PaymentSetup.objects.first()).data
+
+    query_params = {
+        'MerchantLogin': payment_params.get('merchant_login'),
+        'InvoiceID': params.get('InvId'),
+        'Signature': calculate_signature(
+            payment_params.get('merchant_login'),
+            params.get('InvId'),
+            payment_params['password2']
+        )
+    }
+    if query_params:
+        try:
+            response = requests.get(
+                'https://auth.robokassa.ru/Merchant/WebService/Service.asmx/OpStateExt',
+                params=query_params,
+            )
+            response.raise_for_status()
+        except (HTTPError, ConnectionError):
+            pass
+        except Exception:
+            pass
+        else:
+            xml_content = response.content.decode('utf-8-sig')
+            root = ET.fromstring(xml_content)
+            namespaces = {'ns': 'http://merchant.roboxchange.com/WebService/'}
+            result = root.find('.//ns:Result', namespaces)
+            code = result.find('ns:Code', namespaces).text
+            if code == '0':
+                payment_status = {'status': 1}
+
+    return JsonResponse(payment_status, status=200, safe=False)

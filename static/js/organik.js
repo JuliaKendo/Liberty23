@@ -228,6 +228,22 @@
   $("#accordion .collapse").on("shown.bs.collapse", function () {
     $(this).prev().addClass("active");
     $(this).prev().parent().addClass("active");
+    if ($("#submit-order")) {
+      if (compareElements($(this).prev(), $('h2[name="para-title-order"]'))) {
+        const submitOrderWithContext = $(this).prev().length ? 
+          submitOrderEvent.bind($(this).prev()[0]) :
+          null;
+        if (submitOrderWithContext)
+            $('#submit-order').off('click').on('click', submitOrderWithContext);
+      }
+      if (compareElements($(this).prev(), $('h2[name="para-title-payment"]'))) {
+        const createPaymentWithContext = $(this).prev().length ?
+          createPaymentEvent.bind($(this).prev()[0]) : 
+          null;
+        if (createPaymentWithContext)
+          $('#submit-order').off('click').on('click', createPaymentWithContext);
+      }
+    }
   });
   $("#accordion .collapse").on("hidden.bs.collapse", function () {
     $(this).prev().removeClass("active");
@@ -439,43 +455,8 @@
   }
   if ($("#submit-order")) {
     $("#submit-order").on("click", function() {
-      let $form = $('#primary-form');
-      let $additionalForm = $('#additional-form'); let additional_info = NaN;
-      if ($additionalForm.find('input[name="address"]').val())
-        $form = $additionalForm;
-      else {
-        additional_info = $("textarea[name='notes']").val()
-      }
-
-      const formData = new FormData($form[0]);
-      if (additional_info) formData.append('additional_info', additional_info);
-      $.ajax({
-        type: 'POST',
-        url: $form.attr('action'),
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: (result) => {
-          if (isEmpty(result)) {
-            location.href = $("#submit-order").data('url');
-            // location.reload();
-          }
-          $('.text-error').each((_, el) => {
-            let key = el.attributes.name.nodeValue;
-            if (key in result) {
-              el.style.display = 'block';
-              el.innerText = result[key];
-            } else {
-              el.style.display = 'none';
-              el.innerText = '';
-            }
-          });
-        },
-        error: (error) => {
-          console.log(error);
-        }
-      });
-
+      const submitOrder = submitOrderEvent.bind(this);
+      submitOrder();
     });
   }
   if ($("#map").length) {
@@ -540,9 +521,34 @@
 
     });
   }
+  function waitForDialog(element, timeout = 60000) {
+    let elapsed = 0;
+    const interval = 300;
+    const start = Date.now();
 
+    const check = () => {
+      const el = document.querySelector(element);
+      if (el != null) {
+        return detectPaymentDialogClosed(element);
+      }
+      elapsed = Date.now() - start;
+      if (elapsed >= timeout) {
+          return;
+      }
+      setTimeout(check, interval);
+    }
+
+    check();
+  }
   function isEmpty(obj) {
     return Object.keys(obj).length === 0;
+  }
+  function compareElements($elements1, $elements2) {
+    if ($elements1.length !== $elements2.length) {
+      return false;
+    }
+  
+    return $elements1.toArray().every((el1, index) => el1.isEqualNode($elements2.get(index)));
   }
   function dynamicCurrentMenuClass(selector) {
     let FileName = window.location.href.split("/").reverse()[0];
@@ -790,7 +796,129 @@
         console.log(error);
       });  
   }
-
+  function submitOrderEvent() {
+    createOrder('confirmed')
+      .then((response) => {
+        if ('InvId' in response)
+          location.href = $(this).data('url');
+        $('.text-error').each((_, el) => {
+          let key = el.attributes.name.nodeValue;
+          if (key in response) {
+            el.style.display = 'block';
+            el.innerText = response[key];
+          } else {
+            el.style.display = 'none';
+            el.innerText = '';
+          }
+        });
+      })
+      .catch((error) => console.log(error));
+  }
+  function createPaymentEvent() {
+    createOrder('introductory')
+    .then((response) => {
+      if ('InvId' in response)
+        createPayment(response.InvId);
+      $('.text-error').each((_, el) => {
+        let key = el.attributes.name.nodeValue;
+        if (key in response) {
+          el.style.display = 'block';
+          el.innerText = response[key];
+        } else {
+          el.style.display = 'none';
+          el.innerText = '';
+        }
+      });
+    })
+    .catch((error) => console.log(error));
+  }
+  function createPayment(InvId) {
+    let $form = $('#payment-form');
+    const formData = new FormData($form[0]);
+    formData.append('InvId', InvId);
+    $.ajax({
+      url: '/enterprise/payments/params',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: (params) => {
+        // sessionStorage.setItem('InvId', InvId);
+        Robokassa.StartPayment(params);
+        // waitForDialog('#robokassa_iframe');
+        
+      },
+      error: (error) => console.log(error)
+    });
+  }
+  function createOrder(status='introductory') {
+    let $form = $('#primary-form');
+    let $additionalForm = $('#additional-form'); let additional_info = NaN;
+    if ($additionalForm.find('input[name="address"]').val())
+      $form = $additionalForm;
+    else {
+      additional_info = $("textarea[name='notes']").val()
+    }
+    const formData = new FormData($form[0]);
+    if (additional_info) formData.append('additional_info', additional_info);
+    formData.append('status', status);
+    return $.ajax({
+      type: 'POST',
+      url: $form.attr('action'),
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: (result) => {
+        return result;
+      },
+      error: (error) => {
+        throw error;
+      }
+    });
+  }
+  function cancelOrder() {
+    $.ajax({
+      url: '/orders/remove',
+      success: () => {
+        location.reload();
+      },
+      error: () => {
+        location.reload();
+      }
+    });
+  }
+  function detectPaymentDialogClosed(observeElement) {
+    const observedElement = document.querySelector(observeElement);
+    const observer = new MutationObserver((mutationsList, observer) => {
+      for (const mutation of mutationsList) {
+        if (mutation.attributeName === 'style') {
+          const visibility = window.getComputedStyle(observedElement).visibility;
+          if (visibility === 'hidden') {
+            const formData = new FormData();
+            formData.append('InvId', sessionStorage.getItem('InvId'));
+            $.ajax({
+              url: '/enterprise/payments/check',
+              type: 'POST',
+              data: formData,
+              contentType: false,
+              processData: false,
+              success: (params) => {
+                if(params.status === 0)
+                  cancelOrder();
+                sessionStorage.removeItem('InvId');               
+              },
+              error: () => cancelOrder()
+            });
+          }
+        }
+      }
+    });
+    if(observedElement)
+      observer.observe(
+        observedElement, { attributes: true }
+      );
+    return () => observer.disconnect();
+  }
   // window load event
   $(window).on("load", function () {
     if ($(".preloader").length) {
@@ -855,6 +983,7 @@
     }
 
     CartEvents();
+
   });
 
   // window scroll event
