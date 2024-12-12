@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 from .models import News, Department, PaymentSetup
 from .forms import DepartmentsForm
 from .departments import СurrentDepartment
+from orders.library import check_order_status
 
 
 class DepartmentListSerializer(ListSerializer):
@@ -130,13 +131,14 @@ def get_payment_params(request, *args, **kwargs):
 
 
 @api_view(['POST'])
+@check_order_status()
 def check_payment(request, *args, **kwargs):
     def calculate_signature(*args):
         """Create signature MD5.
         """
         return hashlib.md5(':'.join(str(arg) for arg in args).encode()).hexdigest()
 
-    payment_status = {'status': 0}
+    payment_status = {key: value for key, value in kwargs.items() if key == 'status'}
     params = request.POST.dict()
     payment_params = PaymentSetupSerializer(PaymentSetup.objects.first()).data
 

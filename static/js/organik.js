@@ -337,9 +337,7 @@
         success: (_) => {
           location.reload();
         },
-        error: (error) => {
-          console.error(error);
-        }
+        error: (error) => console.error(error)
       });
     });
   }
@@ -358,9 +356,7 @@
           // location.reload();
           window.location.replace($url);
         },
-        error: (error) => {
-          console.error(error);
-        }
+        error: (error) => console.error(error)
       });
     });
   }
@@ -397,9 +393,7 @@
         success: (_) => {
           location.reload();
         },
-        error: (error) => {
-          console.error(error);
-        }
+        error: (error) => console.error(error)
       });
     });
   }
@@ -444,13 +438,9 @@
               document.querySelector('.mini-cart').outerHTML = html;
               CartEvents();
             })
-            .catch(error => {
-              console.log(error);
-            });
+            .catch(error => console.log(error));
         })
-        .catch(error => {
-          console.log(error);
-        })
+        .catch(error => console.log(error))
     });  
   }
   if ($("#submit-order")) {
@@ -661,9 +651,7 @@
             }
           }
         },
-        error: (errors) => {
-          console.log(errors);
-        }
+        error: (errors) => console.log(errors)
       });
     });
     // Закрываем форму по клику на крестик:
@@ -770,9 +758,7 @@
       success: (html) => {
         document.querySelector(".cart-basement").outerHTML = html;
       },
-      error: (error) => {
-        console.log(error);
-      }
+      error: (error) => console.log(error)
     });
   }
   function handleCartItems(target) {
@@ -792,9 +778,7 @@
           cartRow.find("td[name='total_price']")?.html(`р.${decimalFormat(cartItem.total_price, 1)}`);
         updateCartAmounts();
       })
-      .catch(error => {
-        console.log(error);
-      });  
+      .catch(error => console.log(error));  
   }
   function submitOrderEvent() {
     createOrder('confirmed')
@@ -843,9 +827,9 @@
       contentType: false,
       processData: false,
       success: (params) => {
-        // sessionStorage.setItem('InvId', InvId);
+        sessionStorage.setItem('InvId', InvId);
         Robokassa.StartPayment(params);
-        // waitForDialog('#robokassa_iframe');
+        waitForDialog('#robokassa_iframe');
         
       },
       error: (error) => console.log(error)
@@ -876,15 +860,32 @@
       }
     });
   }
-  function cancelOrder() {
+  function cancelOrder(invId) {
     $.ajax({
-      url: '/orders/remove',
-      success: () => {
-        location.reload();
+      url: `/orders/remove/${invId}`,
+      success: () => location.reload(),
+      error: () => location.reload()
+    });
+  }
+  function checkOrderPayment() {
+    const invId = sessionStorage.getItem('InvId')
+    const formData = new FormData();
+    formData.append('InvId', invId);
+    $.ajax({
+      url: '/enterprise/payments/check',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: (params) => {
+        sessionStorage.removeItem('InvId');
+        if(params.status == 0) {
+          cancelOrder(invId);
+        } else {
+          location.href = `${location.origin}/catalog/products`;
+        }            
       },
-      error: () => {
-        location.reload();
-      }
+      error: () => cancelOrder(invId)
     });
   }
   function detectPaymentDialogClosed(observeElement) {
@@ -894,21 +895,7 @@
         if (mutation.attributeName === 'style') {
           const visibility = window.getComputedStyle(observedElement).visibility;
           if (visibility === 'hidden') {
-            const formData = new FormData();
-            formData.append('InvId', sessionStorage.getItem('InvId'));
-            $.ajax({
-              url: '/enterprise/payments/check',
-              type: 'POST',
-              data: formData,
-              contentType: false,
-              processData: false,
-              success: (params) => {
-                if(params.status === 0)
-                  cancelOrder();
-                sessionStorage.removeItem('InvId');               
-              },
-              error: () => cancelOrder()
-            });
+            checkOrderPayment();
           }
         }
       }

@@ -308,14 +308,13 @@ def order_remove(request, order_id=None):
 
 
 @require_GET
-def result_payment(request, *args, **kwargs):
+def handle_result_payment(request, *args, **kwargs):
     result = request.GET.dict()
     if result and result.get('InvId') and result.get('IncSum'):
         order = get_object_or_404(Order, pk=result.get('InvId'))
         order.status = 'paid'
         order.save()
-        return redirect('catalog:products')
-    return redirect('orders:pre-order')
+    return HttpResponse('')
 
 
 @api_view(['GET'])

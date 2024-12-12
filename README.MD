@@ -232,7 +232,7 @@ curl http://127.0.0.1:8000/orders/export/2004-01-01/2012-10-19 -H "Authorization
 
 Для подключение сервиса приема оплаты Robokassa необходимо в личном кабинете создать и активировать [магазин](https://partner.robokassa.ru/Auth/Login?ReturnUrl=%2fShops%2fEdit%2f).
 В технических параметрах магазина указать следующие GET ссылки:
-  - Result URL - /orders/payment (обработчик ответа сервиса)
+  - Result URL - /orders/payment/result (обработчик ответа сервиса)
   - Success URL - /catalog/products (перенаправление в случае успешной оплаты)
   - Fail URL - /orders/remove (возврат обратно к оплате заказа)
 
