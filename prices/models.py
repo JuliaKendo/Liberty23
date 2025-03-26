@@ -1,7 +1,7 @@
 from django.db import models
 from contextlib import suppress
 from django.core.validators import MinValueValidator
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Subquery, OuterRef
 from django.utils import timezone
 
 from enterprise.models import Department
@@ -24,14 +24,22 @@ class PriceQuerySet(models.QuerySet):
     def available_prices(self, products, price_type = None):
         with suppress(PriceType.DoesNotExist):
             if not price_type:
-                price_type = PriceType.objects.get(name='Базовая')   
-            return self.distinct().filter(
+                price_type = PriceType.objects.get(name='Базовая')  
+            latest_prices = (
+                self.filter(
+                    type=price_type,
+                    product=OuterRef("product"),  # Для каждого продукта
+                    start_at__lte=timezone.now(),
+                )
+                .filter(Q(end_at__isnull=True) | Q(end_at__gte=timezone.now()))
+                .order_by("-start_at")  # Берем самую позднюю дату
+                .values("id")[:1]  # Берем только ID одной записи
+            )
+            return self.filter(
                 type=price_type,
                 product__in=products,
-                start_at__lte=timezone.now()
-            ).filter(
-                Q(end_at__isnull=True) | Q(end_at__gte=timezone.now())
-            ).annotate(actual_price=Max('price'))
+                id__in=Subquery(latest_prices)
+            )
         return self.all()
 
 
