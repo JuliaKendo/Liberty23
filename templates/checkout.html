@@ -24,6 +24,55 @@
 		{% if not request.user.is_authenticated %}
 			<p>Уже регистрировались? <a href="#" class="login__toggler main-menu__login_item">Нажмите для входа</a></p>
 		{% endif %}
+		<h3 class="order-title">ВАШ ЗАКАЗ</h3>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="order-details">
+					<div class="order-details__top">
+						<p>Товар</p>
+						<p>Стоимость</p>
+					</div>
+					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
+					{% for cart_item in basket %}
+						{% with product=cart_item.product %}
+							<p>
+								<span>{{ product.name }}</span>
+								{% if cart_item.sum %}
+									<span>{{ cart_item.sum|floatformat:2|intcomma }} руб.</span>
+								{% else %}
+									<span>0,00 руб.</span>
+								{% endif %}
+							</p>
+						{% endwith %}
+					{% endfor %}
+					{% if delivery_price and basket %}
+						<p>
+							<span>Доставка</span>
+							<span>{{ delivery_price|floatformat:2|intcomma }} руб.</span>
+						</p>
+					{% endif %}
+				</div>
+			</div>
+			<div class="col-md-6">
+				{% if ready_for_payment %}
+					{% include "components/orders/payment.html" %}
+				{% else %}
+					<div class="order-status">
+						<h2 class="para-title active" style="height: 4rem;">
+							<div class="order-status-container">
+								<p>
+									Статус заказа:
+								</p>
+								<span>{{ order.get_status_display }}</span>
+							</div>
+						</h2>
+						<div>
+							{% include "components/orders/order-amounts.html" with order=order items=basket delivery_price=delivery_price %}
+						</div>
+					</div>
+				{% endif %}
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-lg-6">
 				<h3>Детали заказа</h3>
@@ -86,7 +135,7 @@
 			<div class="col-lg-6">
 				<h3>
 					<input type="checkbox" id="shipDetails">
-					<label for="shipDetails">Адрес доставки (отличный от основного)</label>
+					<label for="shipDetails">Адрес доставки, отличный от основного <sup>*</sup> :</label>
 				</h3>
 				<form id="additional-form" action="{% url 'orders:add' %}" class="contact-form-validated contact-one__form">
 					<div class="row">
@@ -133,61 +182,8 @@
 				</form>
 			</div>
 		</div>
-		<h3 class="order-title">ВАШ ЗАКАЗ</h3>
 		<div class="row">
-			<div class="col-md-6">
-				<div class="order-details">
-					<div class="order-details__top">
-						<p>Товар</p>
-						<p>Стоимость</p>
-					</div>
-					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
-					{% for cart_item in basket %}
-						{% with product=cart_item.product %}
-							<p>
-								<span>{{ product.name }}</span>
-								{% if cart_item.sum %}
-									<span>{{ cart_item.sum|floatformat:2|intcomma }} руб.</span>
-								{% else %}
-									<span>0,00 руб.</span>
-								{% endif %}
-							</p>
-						{% endwith %}
-					{% endfor %}
-					{% if delivery_price and basket %}
-						<p>
-							<span>Доставка</span>
-							<span>{{ delivery_price|floatformat:2|intcomma }} руб.</span>
-						</p>
-					{% endif %}
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="order-payment">
-					<ul id="accordion" class="list-unstyled" data-wow-duration="1500ms">
-						<li>
-							<h2 name="para-title-order" class="para-title active">
-								<span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-									Заказать без оплаты
-								</span>
-							</h2>
-							<div id="collapseTwo" class="collapse show" role="button" aria-labelledby="collapseTwo" data-parent="#accordion">
-								<p>Будет сформирован счет на оплату и отправлен на указанную электронную почту.</p>
-							</div>
-						</li>
-						<li>
-							<h2 name="para-title-payment" class="para-title ">
-								<span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-									Оплатить и заказать
-									<img src="{% static '/images/resources/robokassa.png' %}" alt="" style="height: 10px; margin-top: 5px;">
-								</span>
-							</h2>
-							<div id="collapseOne" class="collapse " aria-labelledby="collapseOne" data-parent="#accordion">
-								<p></p>
-							</div>
-						</li>
-					</ul>
-				</div>
+			<div class="col-md-12">
 				<div class="text-right">
 					<form id="payment-form" method="post" action="#" visibility="hidden">
 						{% with cart_item=basket|first %}
@@ -198,7 +194,11 @@
 						<input type="hidden" name="Culture" value="ru" />
 						<input type="hidden" name="Encoding" value="utf-8" />
 					  </form>
-					<a href="javascript:void(0);" class="thm-btn" id="submit-order" data-url="{% url 'catalog:products' %}" visibility="visibility">Заказать</a>
+					{% if ready_for_payment %}
+						<a href="javascript:void(0);" class="thm-btn" id="submit-order" data-url="{% url 'catalog:products' %}" visibility="visibility">Заказать</a>
+					{% else %}
+						<a href="{% url 'orders:list' %}" class="thm-btn" visibility="visibility">Закрыть</a>
+					{% endif %}
 				</div>
 			</div>
 		</div>

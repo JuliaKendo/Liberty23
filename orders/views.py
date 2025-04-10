@@ -3,12 +3,16 @@ import json
 from random import choice
 from string import digits, ascii_letters
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import TemplateView
+from django.views.generic import ListView, TemplateView
 from django.views.decorators.http import require_POST, require_GET
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
@@ -104,6 +108,41 @@ class OrderSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class OrdersView(ListView):
+    model = Order
+    template_name = 'orders.html'
+    context_object_name = 'orders'
+    allow_empty = True
+    paginate_by = 10
+
+    def get_queryset(self):
+        department_instance = СurrentDepartment(self.request)
+        queryset = Order.objects.filter(
+            department=department_instance.department,
+            customer=self.request.user
+        )
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.object_list = self.get_queryset()
+        context = super().get_context_data(**kwargs)
+
+        paginator = Paginator(context['orders'], self.paginate_by)
+        page = self.request.GET.get('page')
+        
+        try:
+            order_page = paginator.page(page)
+        except PageNotAnInteger:
+            order_page = paginator.page(1)
+        except EmptyPage:
+            order_page = paginator.page(paginator.num_pages)
+
+        context['orders']  = order_page
+        context['MEDIA_URL'] = settings.MEDIA_URL
+    
+        return context
+
+
 class CheckoutView(TemplateView):
     template_name = 'checkout.html'
 
@@ -114,12 +153,12 @@ class CheckoutView(TemplateView):
         if self.request.user.is_authenticated:
             context['delivery_addresses'] = DeliveryAddresses.objects.filter(customer=self.request.user).order_by('-created_at')
             context['delivery_price'] = get_delivery_price(self.request)
-
+        context['order'] = Order.objects.none()
+        context['ready_for_payment'] = True
         return context
 
 
 class PreOrderView(CheckoutView):
-    template_name = 'checkout.html'
 
     def dispatch(self, request, *args, **kwargs):
         basket = []
@@ -158,6 +197,18 @@ class PreOrderView(CheckoutView):
         if user:
             context['basket'] = Basket.objects.filter(user=user).annotate(sum__sum=Sum('sum'))
 
+        return context
+
+class OrderView(CheckoutView):
+    def get_context_data(self, **kwargs): 
+        context = super().get_context_data(**kwargs)
+        order_id = kwargs.get('order_id')
+        if not order_id:
+            return context
+        
+        context['ready_for_payment'] = False
+        context['order'] = get_object_or_404(Order, pk=order_id)
+        context['basket'] = OrderItem.objects.filter(order__pk=order_id)
         return context
 
 
@@ -304,7 +355,7 @@ def order_remove(request, order_id=None):
             if transaction.get_autocommit():
                 transaction.commit()
 
-    return redirect('orders:pre-order')
+    return redirect('orders:list')
 
 
 @require_GET

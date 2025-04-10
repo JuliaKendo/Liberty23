@@ -1,0 +1,24 @@
+{% load static %}
+{% load humanize %}
+{% load order_tags %}
+
+<div class="row order-basement">
+    <div class="col-lg-12">
+        <ul class="order-total list-unstyled">
+            <li>
+                <span>Вес</span>
+                <span>{{ order.get_total_weight|floatformat:3|intcomma }} кг.</span>
+            </li>
+            <li>
+                <span>Всего</span>
+                <span>{{ order.get_total_cost }} руб.</span>
+            </li>
+            <li>
+                <span>Итого с доставкой</span>
+                {% with sum=order.get_total_cost|add:delivery_price %}
+                    <span>{{ sum|floatformat:2|intcomma }} руб.</span>
+                {% endwith %}
+            </li>
+        </ul>
+    </div>
+</div>

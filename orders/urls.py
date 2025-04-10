@@ -21,8 +21,10 @@ urlpatterns = [
     # path('checkout', render, kwargs={'template_name': 'checkout.html'}, name='checkout'),
     # re_path(r'^$', views.orders, name='all'),
     
+    path('', views.OrdersView.as_view(), name='list'),
     path('checkout', views.CheckoutView.as_view(), name='checkout'),
     path('pre-order', views.PreOrderView.as_view(), name='pre-order'),
+    re_path(r'^order/(?P<order_id>\d+)/$', views.OrderView.as_view(), name='order'),
     re_path(r'^add/$', views.order_add, name='add'),
     re_path(r'^remove/$', views.order_remove, name='remove'),
     re_path(r'^remove/(?P<order_id>\d+)/$', views.order_remove, name='remove'),

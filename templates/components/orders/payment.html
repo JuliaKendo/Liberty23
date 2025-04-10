@@ -1,0 +1,25 @@
+<div class="order-payment">
+    <ul id="accordion" class="list-unstyled" data-wow-duration="1500ms">
+        <li>
+            <h2 name="para-title-order" class="para-title active">
+                <span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Заказать без оплаты
+                </span>
+            </h2>
+            <div id="collapseTwo" class="collapse show" role="button" aria-labelledby="collapseTwo" data-parent="#accordion">
+                <p>Будет сформирован счет на оплату и отправлен на указанную электронную почту.</p>
+            </div>
+        </li>
+        <li>
+            <h2 name="para-title-payment" class="para-title ">
+                <span class="collapsed" role="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    Оплатить и заказать
+                    <img src="{% static '/images/resources/robokassa.png' %}" alt="" style="height: 10px; margin-top: 5px;">
+                </span>
+            </h2>
+            <div id="collapseOne" class="collapse " aria-labelledby="collapseOne" data-parent="#accordion">
+                <p></p>
+            </div>
+        </li>
+    </ul>
+</div>

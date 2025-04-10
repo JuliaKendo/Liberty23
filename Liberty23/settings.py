@@ -98,6 +98,7 @@ TEMPLATES = [
                 'catalog_tags': 'catalog.templatetags.tags',
                 'cart_tags': 'cart.templatetags.tags',
                 'news_tags': 'enterprise.templatetags.tags',
+                'order_tags': 'orders.templatetags.tags',
             },
         },
     },
