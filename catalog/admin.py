@@ -68,6 +68,7 @@ class ProductAdmin(admin.ModelAdmin):
         'name',
         'unit',
         'stock',
+        'weight',
         'price'
     ]
     fields = [
@@ -77,7 +78,7 @@ class ProductAdmin(admin.ModelAdmin):
         'articul',
         'name',
         'unit',
-        'stock',
+        ('stock', 'weight'),
         'description',
         'created_at',
     ]
@@ -89,6 +90,7 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = [
         'image_tag',
         'created_at',
+        'stock',
     ]
     inlines = [
         ProductImageInLine,

@@ -38,6 +38,20 @@ def cart_sub(request, product_id):
         )
     return JsonResponse(cart.to_json(key=product_id), safe=False)
 
+@require_POST
+def cart_update(request, product_id):
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    form = CartAddProductForm(request.POST)
+    if form.is_valid():
+        cd = form.cleaned_data
+        cart.add(
+            product=product,
+            quantity=cd['quantity'],
+            price=cd['price'],
+            update_quantity=cd['update']
+        )
+    return JsonResponse(cart.to_json(key=product_id), safe=False)
 
 def cart_remove(request, product_id):
     cart = Cart(request)
@@ -59,9 +73,21 @@ def cart_detail(request):
 
 def mini_cart_detail(request):
     cart = Cart(request)
-    return render(request, 'components/cart/mini-cart.html', {'cart': cart})
+    return render(
+        request,
+        'components/cart/mini-cart.html',
+        {
+            'cart': cart,
+            'delivery_price': get_delivery_price(request)
+    })
 
 
 def cart_amounts(request):
     cart = Cart(request)
-    return render(request, 'components/cart/cart-amounts.html', {'cart': cart})
+    return render(
+        request,
+        'components/cart/cart-amounts.html',
+        {
+            'cart': cart,
+            'delivery_price': get_delivery_price(request)
+    })

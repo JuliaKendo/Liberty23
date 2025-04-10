@@ -50,7 +50,10 @@ class Product(models.Model):
     ))
     stock = models.PositiveIntegerField(
         'Остаток', default=0, validators=[MinValueValidator(0)]
-    ) 
+    )
+    weight = models.FloatField(
+        'Вес', default=0, validators=[MinValueValidator(0)]
+    )
     created_at = models.DateTimeField(
         'Дата создания', db_index=True, auto_now_add=True
     )

@@ -260,11 +260,11 @@
   //     const $form = $(this).parent().find("form[name='cart-form']")[0];
   //     updateCart($form, $(this).data('url'))
   //       .then(cartItem => {
-  //         updateCartQuantity(
+  //         updateCartCount(
   //           document.querySelector(`#cart-count-${cartItem.id}`),
   //           cartItem.quantity
   //         );
-  //         updateCartQuantity(
+  //         updateCartCount(
   //           document.querySelector(".topbar__buttons .cart-count"),
   //           cartItem.total_quantity
   //         );
@@ -282,11 +282,11 @@
   //     const $form = $(this).parent().find("form[name='cart-form']")[0];
   //     updateCart($form, $(this).data('url'))
   //       .then(cartItem => {
-  //         updateCartQuantity(
+  //         updateCartCount(
   //           document.querySelector(`#cart-count-${cartItem.id}`),
   //           cartItem.quantity
   //         );
-  //         updateCartQuantity(
+  //         updateCartCount(
   //           document.querySelector(".topbar__buttons .cart-count"),
   //           cartItem.total_quantity
   //         );
@@ -425,11 +425,11 @@
       const $form = e.currentTarget.querySelector("form[name='add-to-cart-form']");
       updateCart($form, $form.action)
         .then(cartItem => {
-          updateCartQuantity(
+          updateCartCount(
             e.currentTarget.querySelector("span[class='cart-count']"),
             cartItem.quantity
           );
-          updateCartQuantity(
+          updateCartCount(
             document.querySelector(".topbar__buttons .cart-count"),
             cartItem.total_quantity
           );
@@ -665,7 +665,12 @@
 
   }
   function updateCart($form, url) {
-    const formData = new FormData($form);
+    let formData = new FormData();
+    if ($form instanceof FormData) {
+      formData = $form;
+    } else {
+      formData = new FormData($form);
+    }
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'POST',
@@ -674,8 +679,11 @@
         contentType: false,
         processData: false,
         success: (result) => {
-          const cartItem = result.find(_=>true);
-          $($form).find('input[name="update"]')?.val(cartItem.update);
+          let cartItem = undefined;
+          if (typeof result !== "string") {
+            cartItem = result.find(_=>true);
+            $($form).find('input[name="update"]')?.val(cartItem.update);
+          }
           resolve(cartItem);
         },
         error: (error) => {
@@ -698,7 +706,7 @@
       });
     });
   }
-  function updateCartQuantity(target, quantity=0) {
+  function updateCartCount(target, quantity=0) {
     if (target) {
       if (!quantity)
       target.style.display = 'none';
@@ -708,10 +716,21 @@
       }
     }
   }
+  function updateCartQuantity(target, quantity=0) {
+    if (target) {
+      if (!quantity) {
+        target.value = 1;
+      } else {
+        target.value = quantity;
+      }
+    }
+  }
   function CartEvents() {
     $(".mini-cart__toggler").off("click");
     $(".add").off("click"); $(".sub").off("click");
     $('.quantity-box input').off('change');
+    $('.addto-cart-box button').off('click');
+
     $(".mini-cart__toggler").on("click", function (e) {
       e.preventDefault();
       if (location.pathname != '/cart/') {
@@ -747,6 +766,29 @@
         handleCartItems($(e.currentTarget));
       }
     });
+    $('.addto-cart-box button').on('click', (e) => {
+      e.preventDefault();
+      const target = $(e.currentTarget);
+      const inCartQuantity = +target.parent().parent().find("div[name='cart_quantity']")?.text() || 0;
+      const $formData = new FormData();
+      const $form = target.parent().parent().find("form[name='cart-form']");
+      $.each($form.find('input'), (_, el) => {
+        if (el.name === 'quantity') {
+          $formData.append(el.name, el.value-inCartQuantity);
+        } else {
+          $formData.append(el.name, el.value);
+        }
+      });
+      let url = target.data('url');
+      if ($formData.get('quantity') <= 0) 
+        url = url.replace('update', 'remove');
+      updateCart($formData, url)
+        .then(_ => {
+          location.reload();
+        })
+        .catch(error => console.log(error));
+
+    });
   }
   function updateCartAmounts() {
     if (location.pathname != '/cart/') {
@@ -762,14 +804,17 @@
     });
   }
   function handleCartItems(target) {
+    const $addToCartBox = $(".addto-cart-box");
+    if ($addToCartBox.length > 0 
+        && $(target).parents('.product-quantity-box').length > 0) return;
     const $form = target.parent().find("form[name='cart-form']")[0];
     updateCart($form, target.data('url'))
       .then(cartItem => {
-        updateCartQuantity(
+        updateCartCount(
           document.querySelector(`#cart-count-${cartItem.id}`),
           cartItem.quantity
         );
-        updateCartQuantity(
+        updateCartCount(
           document.querySelector(".topbar__buttons .cart-count"),
           cartItem.total_quantity
         );
@@ -777,6 +822,10 @@
         if (cartRow)
           cartRow.find("td[name='total_price']")?.html(`р.${decimalFormat(cartItem.total_price, 1)}`);
         updateCartAmounts();
+        updateCartQuantity(
+          document.querySelector(`.product-quantity-box[name='product-quantity-box-${cartItem.id}'] form[name='cart-form'] input[name='quantity']`),
+          cartItem.quantity
+        );
       })
       .catch(error => console.log(error));  
   }

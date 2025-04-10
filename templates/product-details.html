@@ -19,7 +19,6 @@
 
 </section>
 
-
 <section class="product_detail">
     <div class="container">
         <div class="row">
@@ -54,36 +53,56 @@
                         <p>{{ product.description }}</p>
                     </div> -->
                     <ul class="list-unstyled product_detail_address">
-                        <li>REF.  {{ product.articul }}</li>
+                        <li>Артикул:  {{ product.articul }}</li>
                         <li>Доступно на складе: {{ product.stock }}  {{ product.get_unit_display }}.</li>
                     </ul>
-                    <div class="product-quantity-box">
+                    <div class="product-quantity-box" name="product-quantity-box-{{ product.id }}">
                         <div class="quantity-box">
-                            <button type="button" class="sub">-</button>
-                            <input type="number" id="2" value="1" />
-                            <button type="button" class="add">+</button>
+                            {% with cart_item=cart|get_cart_item:product %}
+                            <form name="cart-form" action="#">
+                                {% csrf_token %}
+                                <button type="button" class="sub">-</button>
+                                {% if cart_item.quantity > 0 %}
+                                    <input type="number" name="quantity" value="{{ cart_item.quantity }}" />
+                                {% else %}
+                                    <input type="number" name="quantity" value="1" />
+                                {% endif %}
+                                <button type="button" class="add">+</button>
+                                <input type="hidden" name="unit" value="{{ product.unit }}">
+                                {% if cart_item.price %}
+                                    <input type="hidden" name="price" value="{{ current_price.price|floatformat:2|decimal_price }}">
+                                {% else %}
+                                    <input type="hidden" name="price" value="0.00">
+                                {% endif %}
+                                {% if cart_item.quantity > 0 %}
+                                    <input type="hidden" name="update" value="1">
+                                {% else %}
+                                    <input type="hidden" name="update" value="0">
+                                {% endif %}
+                            </form>
+                            <div name="cart_quantity" style="visibility: hidden;">{{ cart_item.quantity }}</div>
+                            {% endwith %}
                         </div>
                         <div class="addto-cart-box">
-                            <button class="thm-btn" type="submit">Добавить в корзину</button>
+                            <button class="thm-btn" type="button" data-url="{% url 'cart:update' product.id %}">Добавить в корзину</button>
                         </div>
                         <!-- <div class="wishlist_btn">
                             <a href="#" class="thm-btn">Add to Wishlist</a>
                         </div> -->
                     </div>
                     <ul class="list-unstyled category_tag_list">
-                        <li><span>Категория:</span> {{ product.category.name }}</li>
-                        <!-- <li><span>Tags:</span> Vegetables, Fruits</li> -->
+                        <!-- <li><span>Категория:</span> {{ product.category.name }}</li> -->
                     </ul>
-                    <div class="product_detail_share_box">
+                    <!-- <div class="product_detail_share_box">
                         <div class="share_box_title">
-                            <!-- <h2>Share with friends</h2> -->
+                            <h2>Share with friends</h2>
                         </div>
                         <div class="share_box_social">
                             <a href="#"><i class="fab fa-facebook-square"></i></a>
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fab fa-instagram"></i></a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -106,7 +125,7 @@
 
                         <div class="tab" id="addi__info">
                             <ul class="additionali_nfo list-unstyled">
-                                <li><span>Вес:</span> - kg</li>
+                                <li><span>Вес:</span> {{ product.weight }} кг.</li>
                                 <li><span>Категория:</span>{{ product.category.name }}</li>
                                 <!-- <li><span>Tags:</span>Vegetables, Fruits</li> -->
                             </ul>

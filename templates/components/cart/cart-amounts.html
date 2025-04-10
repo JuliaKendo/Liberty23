@@ -12,6 +12,10 @@
     <div class="col-lg-4">
         <ul class="cart-total list-unstyled">
             <li>
+                <span>Вес</span>
+                <span>{{ cart.get_total_weight|floatformat:3|intcomma }} кг.</span>
+            </li>
+            <li>
                 <span>Всего</span>
                 <span>{{ cart.get_total_price }} руб.</span>
             </li>

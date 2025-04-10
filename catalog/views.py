@@ -154,6 +154,7 @@ class ProductCardView(DetailView):
             'prices'                 : Price.objects.available_prices(
                 Product.objects.filter(pk=context['product'].id)
             ),
+            'cart'                   : Cart(self.request),
             'similar_products'       : similar_products,
             'similar_products_prices': similar_products_prices,
             'MEDIA_URL'              : settings.MEDIA_URL
