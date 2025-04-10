@@ -70,6 +70,8 @@ cd Liberty23
 
 `ALLOWED_HOSTS` - см [Django docs](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts).
 
+`ALLOWED_PORT` - порт хоста, если есть
+
 `TG_TOKEN` - токен телеграмм бота для сбора логов
 
 `TG_CHART_ID` - id пользователя или группы телеграмм

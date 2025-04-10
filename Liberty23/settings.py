@@ -36,6 +36,9 @@ DEBUG = env.bool('DEBUG', True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
 # CSRF_TRUSTED_ORIGINS = ['http://', 'https://']
+
+ALLOWED_PORT = env('ALLOWED_PORT', '')
+
 LOG_ENV = env('LOG_ENV', 'development' if DEBUG else 'production')
 
 # Application definition
