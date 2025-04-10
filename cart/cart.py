@@ -5,6 +5,12 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework_recursive.fields import RecursiveField
 
 from catalog.models import Category, Product
+from enterprise.models import EnterpriseSetting
+
+class BasketOverWeight(BaseException):
+
+    def __str__(self):
+        return 'Превышен допустимый вес корзины.'
 
 
 class CategorySerializer(ModelSerializer):
@@ -71,6 +77,11 @@ class Cart(object):
     def get_total_weight(self):
         return sum(float(item['product']['weight']) * item['quantity'] for item in self.cart.values())
 
+    def get_weight_limit(self):
+        with suppress(EnterpriseSetting.DoesNotExist):
+            enterprise_setting = EnterpriseSetting.objects.first()
+            return enterprise_setting.max_cart_weght
+
     def add(self, product, quantity=1, price=0, update_quantity=False):
         product_id = str(product.id)
         with suppress(Product.DoesNotExist):
@@ -85,6 +96,11 @@ class Cart(object):
                 self.cart[product_id]['quantity'] += quantity
             else:
                 self.cart[product_id]['quantity'] = quantity
+            weight_limit = self.get_weight_limit()
+            weight_products = self.get_total_weight()
+            if weight_limit and weight_limit < weight_products:
+                raise BasketOverWeight
+
             self.save()
 
 

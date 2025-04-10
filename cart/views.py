@@ -1,9 +1,10 @@
 import json
+from contextlib import suppress
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .cart import Cart
+from .cart import Cart, BasketOverWeight
 from .forms import CartAddProductForm
 from catalog.models import Product
 from prices.lib import get_delivery_price
@@ -14,15 +15,17 @@ def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     form = CartAddProductForm(request.POST)
-    if form.is_valid():
-        cd = form.cleaned_data
-        cart.add(
-            product=product,
-            quantity=cd['quantity'],
-            price=cd['price'],
-            update_quantity=cd['update']
-        )
-    return JsonResponse(cart.to_json(key=product_id), safe=False)
+    with suppress(BasketOverWeight):
+        if form.is_valid():
+            cd = form.cleaned_data
+            cart.add(
+                product=product,
+                quantity=cd['quantity'],
+                price=cd['price'],
+                update_quantity=cd['update']
+            )
+        return JsonResponse(cart.to_json(key=product_id), safe=False)
+    return HttpResponse("Превышен допустимый вес корзины.", status=500)
 
 
 @require_POST

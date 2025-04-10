@@ -97,7 +97,7 @@ class Order(models.Model):
         return sum(item.quantity for item in self.items.all())
     
     def get_total_weight(self):
-        return sum(item.product.weight for item in self.items.all())
+        return sum(item.product.weight * item.quantity for item in self.items.all())
 
     def natural_key(self):
         return (self.id, self.created_at, )

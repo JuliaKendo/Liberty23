@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load humanize %}
 {% block page %}
 
 <div class="stricky-header stricked-menu main-menu">
@@ -43,10 +44,10 @@
                                 {{ order.get_status_display }}
                             </td>
                             <td>
-                                {{ order.get_total_weight }}
+                                {{ order.get_total_weight|floatformat:3|intcomma }}
                             </td>
                             <td>
-                                {{ order.get_total_cost }}
+                                {{ order.get_total_cost|floatformat:2|intcomma }}
                             </td>
                     </tr>
                     {% endfor %}

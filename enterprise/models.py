@@ -1,5 +1,6 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.core.validators import MinValueValidator
 
 
 class SingletonModel(models.Model):
@@ -109,3 +110,14 @@ class PaymentSetup(SingletonModel):
 
     def __str__(self):
         return f'{self.name}: {self.merchant_login}'
+
+
+class EnterpriseSetting(SingletonModel):
+    name = models.CharField('название', max_length=150)
+    max_cart_weght = models.PositiveIntegerField(
+        'Максимальный вес корзины, кг.', default=0, validators=[MinValueValidator(0)]
+    )
+
+    class Meta:
+        verbose_name = "Настройки предприятия"
+        verbose_name_plural = "Настройка предприятия"

@@ -188,6 +188,22 @@
       $("body").toggleClass("locked");
     });
   }
+  if ($(".error-toggler").length) {
+    $(".error-toggler").on("click", function (e) {
+      e.preventDefault();
+      $(".error-popup").toggleClass("active");
+      $('.mobile-nav__wrapper').removeClass('expanded');
+      $("body").toggleClass("locked");
+    });
+  }
+  if ($(".error-toast").length) {
+    $(".error-toast button").on("click", function (e) {
+      e.preventDefault();
+      $(".error-popup").toggleClass("active");
+      $('.mobile-nav__wrapper').removeClass('expanded');
+      $("body").toggleClass("locked");      
+    });
+  }
   if ($(".mini-cart__toggler").length) {
     CartEvents();
   }
@@ -337,7 +353,7 @@
         success: (_) => {
           location.reload();
         },
-        error: (error) => console.error(error)
+        error: (error) => handleException(error)
       });
     });
   }
@@ -356,7 +372,7 @@
           // location.reload();
           window.location.replace($url);
         },
-        error: (error) => console.error(error)
+        error: (error) => handleException(error)
       });
     });
   }
@@ -393,7 +409,7 @@
         success: (_) => {
           location.reload();
         },
-        error: (error) => console.error(error)
+        error: (error) => handleException(error)
       });
     });
   }
@@ -438,9 +454,9 @@
               document.querySelector('.mini-cart').outerHTML = html;
               CartEvents();
             })
-            .catch(error => console.log(error));
+            .catch(error => handleException(error));
         })
-        .catch(error => console.log(error))
+        .catch(error => handleException(error))
     });  
   }
   if ($("#submit-order")) {
@@ -651,7 +667,7 @@
             }
           }
         },
-        error: (errors) => console.log(errors)
+        error: (errors => handleException(errors))
       });
     });
     // Закрываем форму по клику на крестик:
@@ -686,9 +702,7 @@
           }
           resolve(cartItem);
         },
-        error: (error) => {
-          reject(error);
-        }
+        error: (error => reject(error))
       });
     });
   }
@@ -700,9 +714,7 @@
         success: (html) => {
           resolve(html);
         },
-        error: (error) => {
-          reject(error);
-        }
+        error: (error => reject(error))
       });
     });
   }
@@ -786,7 +798,7 @@
         .then(_ => {
           location.reload();
         })
-        .catch(error => console.log(error));
+        .catch(error => handleException(error));
 
     });
   }
@@ -800,7 +812,7 @@
       success: (html) => {
         document.querySelector(".cart-basement").outerHTML = html;
       },
-      error: (error) => console.log(error)
+      error: (error) => handleException(error)
     });
   }
   function handleCartItems(target) {
@@ -827,7 +839,7 @@
           cartItem.quantity
         );
       })
-      .catch(error => console.log(error));  
+      .catch(error => handleException(error));  
   }
   function submitOrderEvent() {
     createOrder('confirmed')
@@ -955,6 +967,14 @@
       );
     return () => observer.disconnect();
   }
+  function handleException(error) {
+    $(".error-popup").toggleClass("active");
+    $('.mobile-nav__wrapper').removeClass('expanded');
+    $("body").toggleClass("locked");
+
+    $(".error-popup .error-toast .error-toast-body").text(`${error.status}: ${error.responseText}`);
+  }
+
   // window load event
   $(window).on("load", function () {
     if ($(".preloader").length) {
