@@ -29,6 +29,16 @@ services:
       - POSTGRES_PASSWORD=12345
       - POSTGRES_DB=main_db
 
+  redis:
+    image: 'redis:6.2-alpine'
+    restart: always
+    hostname: redis
+    environment:
+      REDIS_PWD: '${REDIS_PWD}'
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass $REDIS_PWD
+
   nginx:
     build: ./nginx
     volumes:
