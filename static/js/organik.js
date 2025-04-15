@@ -194,6 +194,10 @@
       $(".error-popup").toggleClass("active");
       $('.mobile-nav__wrapper').removeClass('expanded');
       $("body").toggleClass("locked");
+      if (!$(".error-popup").hasClass('active') && $(".error-popup input[name='reload']").val()) {
+        location.reload();
+      }
+      
     });
   }
   if ($(".error-toast").length) {
@@ -201,7 +205,10 @@
       e.preventDefault();
       $(".error-popup").toggleClass("active");
       $('.mobile-nav__wrapper').removeClass('expanded');
-      $("body").toggleClass("locked");      
+      $("body").toggleClass("locked");
+      if (!$(".error-popup").hasClass('active') && $(".error-popup input[name='reload']").val()) {
+        location.reload();
+      }    
     });
   }
   if ($(".mini-cart__toggler").length) {
@@ -434,30 +441,6 @@
       // $('.mobile-nav__wrapper').removeClass('shown');
       // $("body").toggleClass("locked");
     });
-  }
-  if ($("a[name='add-to-cart']").length) {
-    $("a[name='add-to-cart']").on("click", function (e) {
-      e.preventDefault();
-      const $form = e.currentTarget.querySelector("form[name='add-to-cart-form']");
-      updateCart($form, $form.action)
-        .then(cartItem => {
-          updateCartCount(
-            e.currentTarget.querySelector("span[class='cart-count']"),
-            cartItem.quantity
-          );
-          updateCartCount(
-            document.querySelector(".topbar__buttons .cart-count"),
-            cartItem.total_quantity
-          );
-          updateMiniCart(`${location.origin}/cart/mini`)
-            .then(html => {
-              document.querySelector('.mini-cart').outerHTML = html;
-              CartEvents();
-            })
-            .catch(error => handleException(error));
-        })
-        .catch(error => handleException(error))
-    });  
   }
   if ($("#submit-order")) {
     $("#submit-order").on("click", function() {
@@ -752,7 +735,8 @@
       }
     });
     $(".add").on("click", function () {
-      if ($(this).prev().val() < 999) {
+      const stock = Math.min(Number($(this).prev().attr("max")), 999);
+      if ($(this).prev().val() < stock) {
         $(this)
           .prev()
           .val(+$(this).prev().val()+1);
@@ -766,6 +750,9 @@
           .val(+$(this).next().val()-1);
         handleCartItems($(this));
       }
+    });
+    $("input[name='quantity']").on("input", function () {
+      checkInputRange($(this));
     });
     $('.quantity-box input').on('change', (e) => {
       e.preventDefault();
@@ -798,7 +785,16 @@
         .then(_ => {
           location.reload();
         })
-        .catch(error => handleException(error));
+        .catch(error => {
+          if (error?.responseJSON) {
+            handleException(
+              {'status': error.status, 'responseText': error.responseJSON.error},
+              true
+            );
+          } else {
+            handleException(error, true);
+          }
+        });
 
     });
   }
@@ -815,22 +811,56 @@
       error: (error) => handleException(error)
     });
   }
-  function handleCartItems(target) {
-    const $addToCartBox = $(".addto-cart-box");
-    if ($addToCartBox.length > 0 
-        && $(target).parents('.product-quantity-box').length > 0) return;
-    const $form = target.parent().find("form[name='cart-form']")[0];
-    updateCart($form, target.data('url'))
-      .then(cartItem => {
+  if ($("a[name='add-to-cart']").length) {
+    $("a[name='add-to-cart']").on("click", function (e) {
+
+      const updateCartElements = (cartItem) => {
         updateCartCount(
-          document.querySelector(`#cart-count-${cartItem.id}`),
+          e.currentTarget.querySelector("span[class='cart-count']"),
           cartItem.quantity
         );
         updateCartCount(
           document.querySelector(".topbar__buttons .cart-count"),
           cartItem.total_quantity
         );
-        const cartRow = target.parents("tr[name='cart-row']");
+      }
+
+      e.preventDefault();
+      const $form = e.currentTarget.querySelector("form[name='add-to-cart-form']");
+      updateCart($form, $form.action)
+        .then(cartItem => {
+          updateCartElements(cartItem);     
+          updateMiniCart(`${location.origin}/cart/mini`)
+            .then(html => {
+              document.querySelector('.mini-cart').outerHTML = html;
+              CartEvents();
+            })
+            .catch(error => handleException(error));
+        })
+        .catch(error => {
+          if (error?.responseJSON) {
+            let cartItem = error.responseJSON?.data.find(_=>true);
+            updateCartElements(cartItem);
+            handleException({'status': error.status, 'responseText': error.responseJSON.error});
+          } else {
+            handleException(error);
+          }
+        })
+    });  
+  }
+
+  function handleCartItems(target) {
+
+    const updateCartElements = (target, cartItem) => {
+      updateCartCount(
+        document.querySelector(`#cart-count-${cartItem.id}`),
+        cartItem.quantity
+      );
+      updateCartCount(
+        document.querySelector(".topbar__buttons .cart-count"),
+        cartItem.total_quantity
+      );
+      const cartRow = target.parents("tr[name='cart-row']");
         if (cartRow)
           cartRow.find("td[name='total_price']")?.html(`р.${decimalFormat(cartItem.total_price, 1)}`);
         updateCartAmounts();
@@ -838,8 +868,28 @@
           document.querySelector(`.product-quantity-box[name='product-quantity-box-${cartItem.id}'] form[name='cart-form'] input[name='quantity']`),
           cartItem.quantity
         );
+    }
+
+    const $addToCartBox = $(".addto-cart-box");
+    if ($addToCartBox.length > 0 
+        && $(target).parents('.product-quantity-box').length > 0) return;
+    const $form = target.parent().find("form[name='cart-form']")[0];
+    updateCart($form, target.data('url'))
+      .then(cartItem => {
+        updateCartElements(target, cartItem);
       })
-      .catch(error => handleException(error));  
+      .catch(error => {
+        if (error?.responseJSON) {
+          let cartItem = error.responseJSON?.data.find(_=>true);
+          const cartRow = target.parents("tr[name='cart-row']");
+          if (cartRow)
+            cartRow.find(`.quantity-box #cart-${cartItem.id}`).val(cartItem.quantity);
+          updateCartElements(target, cartItem);
+          handleException({'status': error.status, 'responseText': error.responseJSON.error});
+        } else {
+          handleException(error);
+        }
+      });  
   }
   function submitOrderEvent() {
     createOrder('confirmed')
@@ -967,7 +1017,16 @@
       );
     return () => observer.disconnect();
   }
-  function handleException(error) {
+  function checkInputRange(inputElement) {
+    const value = parseInt(inputElement.val());
+    const stock = Math.min(parseInt(inputElement.attr("max")), 999);
+    
+    if((value > stock || isNaN(value)) & stock !== 0) {
+        inputElement.val(stock);
+    }
+  }
+  function handleException(error, reload=false) {
+    if (reload) $('input[name="reload"]').val(1);
     $(".error-popup").toggleClass("active");
     $('.mobile-nav__wrapper').removeClass('expanded');
     $("body").toggleClass("locked");

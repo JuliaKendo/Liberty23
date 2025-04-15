@@ -121,3 +121,12 @@ class EnterpriseSetting(SingletonModel):
     class Meta:
         verbose_name = "Настройки предприятия"
         verbose_name_plural = "Настройка предприятия"
+
+
+class IntegrationSettings(SingletonModel):
+    name = models.CharField('Наименование', max_length=150)
+    link = models.URLField('Ссылка', max_length = 250)
+
+    class Meta:
+        verbose_name = "Настройка интеграции"
+        verbose_name_plural = "Настройки интеграции"

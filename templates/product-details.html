@@ -63,9 +63,9 @@
                                 {% csrf_token %}
                                 <button type="button" class="sub">-</button>
                                 {% if cart_item.quantity > 0 %}
-                                    <input type="number" name="quantity" value="{{ cart_item.quantity }}" />
+                                    <input type="number" name="quantity" value="{{ cart_item.quantity }}" min="1" max="{{ product.stock }}" />
                                 {% else %}
-                                    <input type="number" name="quantity" value="1" />
+                                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" />
                                 {% endif %}
                                 <button type="button" class="add">+</button>
                                 <input type="hidden" name="unit" value="{{ product.unit }}">

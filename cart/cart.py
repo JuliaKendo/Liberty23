@@ -11,6 +11,12 @@ class BasketOverWeight(BaseException):
 
     def __str__(self):
         return 'Превышен допустимый вес корзины.'
+    
+
+class QuantityOverStock(BaseException):
+
+    def __str__(self):
+        return 'Недостаточно остатка на складе.'
 
 
 class CategorySerializer(ModelSerializer):
@@ -70,6 +76,31 @@ class Cart(object):
     def __len__(self):
         return sum(item['quantity'] for item in self.cart.values())
 
+    def check_cart(self, product, quantity, update):
+        product_id = str(product.id)
+        if self.cart.get(product_id):
+            quantity_in_cart = self.cart[product_id]['quantity']
+            if update:
+                quantity_in_cart += quantity
+            else:
+                quantity_in_cart = quantity
+            weight_products = sum(
+                float(item['product']['weight']) * \
+                    quantity_in_cart if item['product']['id'] == product.id else item['quantity'] \
+                    for item in self.cart.values()
+            )
+        else:
+            quantity_in_cart = quantity
+            weight_products = sum(
+                float(item['product']['weight']) * item['quantity'] for item in self.cart.values()) \
+                    + (quantity_in_cart * float(product.weight)
+            )
+        if quantity_in_cart > product.stock:
+            raise QuantityOverStock
+        weight_limit = self.get_weight_limit()  
+        if weight_limit and weight_limit < weight_products:
+            raise BasketOverWeight
+
 
     def get_total_price(self):
         return sum(float(item['price']) * item['quantity'] for item in self.cart.values())
@@ -86,6 +117,7 @@ class Cart(object):
         product_id = str(product.id)
         with suppress(Product.DoesNotExist):
             current_product = Product.objects.get(id=product_id)
+            self.check_cart(current_product, quantity, update_quantity)
             if product_id not in self.cart:
                 self.cart[product_id] = {
                     'product': ProductSerializer(current_product).data,
@@ -96,10 +128,6 @@ class Cart(object):
                 self.cart[product_id]['quantity'] += quantity
             else:
                 self.cart[product_id]['quantity'] = quantity
-            weight_limit = self.get_weight_limit()
-            weight_products = self.get_total_weight()
-            if weight_limit and weight_limit < weight_products:
-                raise BasketOverWeight
 
             self.save()
 

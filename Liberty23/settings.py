@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     'cart',
     'orders',
     'enterprise',
+
+    'django_rq',
 ]
 
 MIDDLEWARE = [
@@ -184,6 +186,19 @@ REST_FRAMEWORK = {
     ],
 }
 
+# REDIS settings
+REDIS_HOST = env('REDIS_HOST', '127.0.0.1')
+REDIS_PORT = env.int('REDIS_PORT', 6379)
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
+        'PASSWORD': env('REDIS_PWD', ''),
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
 
 CART_SESSION_ID = 'cart'
 DEPARTMENT_SESSION_ID = 'department'

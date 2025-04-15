@@ -22,6 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import DeliveryAddresses, Order, OrderItem
 from .forms import OrderForm, OrderItemForm, DeliveryAddressesForm
+from .tasks import planed_update_of_stoks
 from cart.cart import Cart
 from cart.models import Basket
 from catalog.models import Product
@@ -199,6 +200,7 @@ class PreOrderView(CheckoutView):
 
         return context
 
+
 class OrderView(CheckoutView):
     def get_context_data(self, **kwargs): 
         context = super().get_context_data(**kwargs)
@@ -236,6 +238,7 @@ def create_user_and_login(request, param):
 
 
 @require_POST
+@planed_update_of_stoks()
 def order_add(request):
     user = request.user
     cart = Basket.objects.filter(user=user)
@@ -371,11 +374,20 @@ def handle_result_payment(request, *args, **kwargs):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def unload_orders(request, *args, **kwargs):
+    if kwargs.get('order_id'):
+        order = get_object_or_404(Order, pk=kwargs['order_id'])
+        serialized_order = json.loads(json.dumps(OrderSerializer(order).data))
+        serialized_order['products'] = json.loads(
+            json.dumps(
+                OrderItemSerializer(OrderItem.objects.filter(order_id=order.id), many=True).data
+        ))
+        return JsonResponse(serialized_order, status=200, safe=False)
+
     period = {}
     if kwargs.get('data_from'):
         period['created_at__gte'] = kwargs['data_from']
     if kwargs.get('data_to'):
-        period['created_at__lte'] = kwargs['data_to']  
+        period['created_at__lte'] = kwargs['data_to'] 
     serialized_orders = []
     for order in Order.objects.filter(**period):
         serialized_order = json.loads(json.dumps(OrderSerializer(order).data))

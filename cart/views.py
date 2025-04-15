@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .cart import Cart, BasketOverWeight
+from .cart import Cart, QuantityOverStock, BasketOverWeight
 from .forms import CartAddProductForm
 from catalog.models import Product
 from prices.lib import get_delivery_price
@@ -15,7 +15,7 @@ def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     form = CartAddProductForm(request.POST)
-    with suppress(BasketOverWeight):
+    try:
         if form.is_valid():
             cd = form.cleaned_data
             cart.add(
@@ -24,9 +24,14 @@ def cart_add(request, product_id):
                 price=cd['price'],
                 update_quantity=cd['update']
             )
-        return JsonResponse(cart.to_json(key=product_id), safe=False)
-    return HttpResponse("Превышен допустимый вес корзины.", status=500)
+    except (QuantityOverStock, BasketOverWeight) as error:
+        return JsonResponse({
+            'error': str(error),
+            'data': cart.to_json(key=product_id)
+        }, safe=False, status=400)
 
+    return JsonResponse(cart.to_json(key=product_id), safe=False)
+    
 
 @require_POST
 def cart_sub(request, product_id):
@@ -41,20 +46,28 @@ def cart_sub(request, product_id):
         )
     return JsonResponse(cart.to_json(key=product_id), safe=False)
 
+
 @require_POST
 def cart_update(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     form = CartAddProductForm(request.POST)
-    if form.is_valid():
-        cd = form.cleaned_data
-        cart.add(
-            product=product,
-            quantity=cd['quantity'],
-            price=cd['price'],
-            update_quantity=cd['update']
-        )
+    try:
+        if form.is_valid():
+            cd = form.cleaned_data
+            cart.add(
+                product=product,
+                quantity=cd['quantity'],
+                price=cd['price'],
+                update_quantity=cd['update']
+            )
+    except (QuantityOverStock, BasketOverWeight) as error:
+        return JsonResponse({
+            'error': str(error),
+            'data': cart.to_json(key=product_id)
+        }, safe=False, status=400)
     return JsonResponse(cart.to_json(key=product_id), safe=False)
+
 
 def cart_remove(request, product_id):
     cart = Cart(request)

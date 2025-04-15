@@ -41,6 +41,8 @@ urlpatterns = [
     path('auth-token/', views.AuthToken.as_view()),
 
     path('summernote/'  , include('django_summernote.urls')),
+
+    path('django-rq/'   , include('django_rq.urls')),
     
 ]
 

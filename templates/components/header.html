@@ -9,7 +9,9 @@
                 </a>
                 <div class="mobile-nav__buttons">
                     <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
-                    <a href="javascript:void(0);" class="mini-cart__toggler"><i class="organik-icon-shopping-cart"></i></a>
+                    <!-- <a href="javascript:void(0);" class="mini-cart__toggler"><i class="organik-icon-shopping-cart"></i></a> -->
+                    <a href="{% url 'cart:cart_detail' %}" ><i class="organik-icon-shopping-cart"></i></a>
+                    
                 </div>
 
                 <span class="fa fa-bars mobile-nav__toggler"></span>
@@ -34,7 +36,8 @@
                 </div>
                 <div class="topbar__buttons">
                     <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
-                    <a href="javascript:void(0);" class="mini-cart__toggler">
+                    <!-- <a href="javascript:void(0);" class="mini-cart__toggler"> -->
+                    <a href="{% url 'cart:cart_detail' %}">
                         <i class="organik-icon-shopping-cart"></i>
                         {% with total_items=cart|length %}
                             {% if cart|length > 0 %}

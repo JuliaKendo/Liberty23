@@ -36,7 +36,13 @@
                                 <input type="hidden" name="update" value="1">
                             </form>
                             <button type="button" class="sub" data-url="{% url 'cart:sub' product_id=product.id %}">-</button>
-                            <input type="number" id="mini-cart-{{ product.id }}" value="{{ cart_item.quantity }}" />
+                            <input 
+                                type="number"
+                                name="quantity"
+                                id="mini-cart-{{ product.id }}"
+                                value="{{ cart_item.quantity }}"
+                                min="1" max="{{ product.stock }}"
+                            />
                             <button type="button" class="add" data-url="{% url 'cart:add' product_id=product.id %}">+</button>
                         </div>
                     </div>

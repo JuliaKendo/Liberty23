@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django_summernote.admin import SummernoteModelAdmin
 
-from .models import Contacts, News, Department, PaymentSetup, EnterpriseSetting
+from .models import Contacts, News, Department, PaymentSetup, EnterpriseSetting, IntegrationSettings
 from prices.models import DeliveryPrice
 
 
@@ -111,5 +111,22 @@ class EnterpriseSettingAdmin(admin.ModelAdmin):
     fields = [
         'name',
         'max_cart_weght',
+    ]
+    list_display_links = list_display
+
+
+@admin.register(IntegrationSettings)
+class IntegrationSettingsAdmin(admin.ModelAdmin):
+    search_fields = [
+        'name',
+        'link',
+    ]
+    list_display = [
+        'name',
+        'link',
+    ]
+    fields = [
+        'name',
+        'link',
     ]
     list_display_links = list_display

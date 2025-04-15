@@ -72,6 +72,12 @@ cd Liberty23
 
 `ALLOWED_PORT` - порт хоста, если есть
 
+`REDIS_HOST` - адрес redis сервера, или наименование соответствующего контейнера docker
+
+`REDIS_PORT` - порт redis
+
+`REDIS_PWD` - пароль redis сервера
+
 `TG_TOKEN` - токен телеграмм бота для сбора логов
 
 `TG_CHART_ID` - id пользователя или группы телеграмм
@@ -108,6 +114,8 @@ python manage.py runserver
 
 `ALLOWED_HOSTS` - см [Django docs](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts).
 
+`ALLOWED_PORT` - порт хоста, если есть
+
 `DATABASE` - имя, используемое в sh скрипте для определения типа базы данных (пр. postgres)
 
 `DB_ENGINE` - имя, указывает на используемый движок для доступа к БД. (пр. "django.db.backends.postgresql")
@@ -121,6 +129,12 @@ python manage.py runserver
 `DB_HOST` - имя или ip адрес хоста на котором располагается база данных (в случае развертывания в docker тут пишем имя соответствующего сервиса из docker-compose)
 
 `DB_PORT` - порт на котором развернута база данных на хосте
+
+`REDIS_HOST` - адрес redis сервера, или наименование соответствующего контейнера docker
+
+`REDIS_PORT` - порт redis
+
+`REDIS_PWD` - пароль redis сервера
 
 `TG_TOKEN` - токен телеграмм бота для сбора логов
 
@@ -224,10 +238,16 @@ curl -X POST -H "Content-Type: application/json" -d @media/price.json http://127
 ```
 
 
-### Получение заказов с личного кабинета
+### Получение заказов с сайта
 
 ```sh
 curl http://127.0.0.1:8000/orders/export/2004-01-01/2012-10-19 -H "Authorization: Token 0000000000000000000000000000000000000000"
+```
+
+### Получение заказа с сайта
+
+```sh
+curl http://127.0.0.1:8000/orders/export/{order_id} -H "Authorization: Token 0000000000000000000000000000000000000000"
 ```
 
 # Подключение оплаты через Robokassa
