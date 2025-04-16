@@ -840,7 +840,7 @@
         .catch(error => {
           if (error?.responseJSON) {
             let cartItem = error.responseJSON?.data.find(_=>true);
-            updateCartElements(cartItem);
+            if (cartItem) updateCartElements(cartItem);
             handleException({'status': error.status, 'responseText': error.responseJSON.error});
           } else {
             handleException(error);
@@ -881,10 +881,12 @@
       .catch(error => {
         if (error?.responseJSON) {
           let cartItem = error.responseJSON?.data.find(_=>true);
-          const cartRow = target.parents("tr[name='cart-row']");
-          if (cartRow)
-            cartRow.find(`.quantity-box #cart-${cartItem.id}`).val(cartItem.quantity);
-          updateCartElements(target, cartItem);
+          if (cartItem) {
+            const cartRow = target.parents("tr[name='cart-row']");
+            if (cartRow)
+              cartRow.find(`.quantity-box #cart-${cartItem.id}`).val(cartItem.quantity);
+            updateCartElements(target, cartItem);
+          }
           handleException({'status': error.status, 'responseText': error.responseJSON.error});
         } else {
           handleException(error);
