@@ -24,6 +24,8 @@ from rest_framework_recursive.fields import RecursiveField
 from .filters import FilterTree, ProductFilter, SearchFilter
 
 from .models import Category, Product, ProductImage
+from enterprise.models import Department
+from enterprise.departments import СurrentDepartment
 from prices.models import Price
 from cart.cart import Cart
 
@@ -91,7 +93,10 @@ class ProductsView(FiltersView, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
+        current_department = СurrentDepartment(self.request)
         products = Product.objects.all()
+        if current_department:
+            products = Product.objects.filter(departments__id=current_department.department.id)    
         if self.filters:
             filtred_products = ProductFilter(self.filters, queryset=products)
             products = filtred_products.qs
@@ -175,7 +180,8 @@ def get_or_update_product(data):
     category = get_or_update_category(product_data)
     product, _ = Product.objects.update_or_create(
         identifier_1C=product_data.get('identifier_1C', ''),
-        category=category, defaults = product_data
+        category=category,
+        defaults = {key: value for key, value in product_data.items() if key != 'departments'}
     )
     return product
 
@@ -260,6 +266,13 @@ class CategorySerializer(ModelSerializer):
         list_serializer_class = CategoryListSerializer
 
 
+class DepartmentSerializer(ModelSerializer):
+
+    class Meta:
+        model = Department
+        fields = '__all__'
+
+
 class ProductListSerializer(ListSerializer):
 
     def update(self, _, validated_data):
@@ -269,8 +282,20 @@ class ProductListSerializer(ListSerializer):
             product, _ = Product.objects.update_or_create(
                 identifier_1C=item['identifier_1C'],
                 category=category,
-                defaults = item
+                defaults = {key: value for key, value in item.items() if key != 'departments'}
             )
+            if 'departments' in item:
+                department_identifiers = []
+                product.departments.clear()
+                for department in item['departments']:
+                    department_identifier = dict(department).get('identifier_1C')
+                    if department_identifier:
+                        department_identifiers.append(department_identifier)
+               
+                product.departments.set(
+                    Department.objects.filter(
+                        identifier_1C__in=department_identifiers
+                ))
             ret.append(product)
         return ret
 
@@ -282,6 +307,7 @@ class ProductListSerializer(ListSerializer):
 class ProductSerializer(ModelSerializer):
 
     category = CategorySerializer()
+    departments = DepartmentSerializer(many=True)
 
     class Meta:
         model = Product
@@ -297,8 +323,20 @@ class ProductImageListSerializer(ListSerializer):
             product = get_or_update_product(item)
             product_image, _ = ProductImage.objects.update_or_create(
                 product = product,
-                defaults = item
+                defaults = {key: value for key, value in item.items() if key != 'departments'}
             )
+            if 'departments' in item:
+                department_identifiers = []
+                product.departments.clear()
+                for department in item['departments']:
+                    department_identifier = dict(department).get('identifier_1C')
+                    if department_identifier:
+                        department_identifiers.append(department_identifier)
+               
+                product.departments.set(
+                    Department.objects.filter(
+                        identifier_1C__in=department_identifiers
+                ))
             ret.append(product_image)
             
         return ret

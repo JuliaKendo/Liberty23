@@ -30,7 +30,7 @@ def planed_update_of_stoks():
                     queue.enqueue(
                         launch_update_of_stoks,
                         args=[order_id],
-                        retry=Retry(max=5, interval=[60, 60*5, 60*10, 60*30, 60*60]),
+                        retry=Retry(max=10, interval=[1, 3, 5, 10, 30, 60, 60*5, 60*10, 60*30, 60*60]),
                     )
             return response
         return run_func

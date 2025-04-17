@@ -237,7 +237,6 @@ curl -X POST -H "Content-Type: application/json" -d @media/imgs.json http://127.
 curl -X POST -H "Content-Type: application/json" -d @media/price.json http://127.0.0.1:8000/prices/upload -H "Authorization: Token 0000000000000000000000000000000000000000"
 ```
 
-
 ### Получение заказов с сайта
 
 ```sh

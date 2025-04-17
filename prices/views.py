@@ -19,6 +19,18 @@ def get_or_update_price_type(data):
     )
     return price_type
 
+class DepartmentSerializer(ModelSerializer):
+    
+    class Meta:
+        model = Department
+        fields = '__all__'
+
+    def create(self, validated_data):
+        department, _ = Department.objects.get_or_create(
+            identifier_1C=validated_data['identifier_1C'],
+            defaults=validated_data
+        )
+        return department
 
 class PriceTypeSerializer(ModelSerializer):
 
@@ -30,6 +42,7 @@ class PriceTypeSerializer(ModelSerializer):
 class ProductSerializer(ModelSerializer):
 
     category = CategorySerializer()
+    departments = DepartmentSerializer(many=True)
 
     class Meta:
         model = Product
@@ -61,20 +74,6 @@ class PriceSerializer(ModelSerializer):
         model = Price
         fields = '__all__'
         list_serializer_class = PriceListSerializer
-
-
-class DepartmentSerializer(ModelSerializer):
-    
-    class Meta:
-        model = Department
-        fields = '__all__'
-
-    def create(self, validated_data):
-        department, _ = Department.objects.get_or_create(
-            identifier_1C=validated_data['identifier_1C'],
-            defaults=validated_data
-        )
-        return department
 
 
 class DeliveryPriceListSerializer(ListSerializer):

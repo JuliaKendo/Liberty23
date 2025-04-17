@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from enterprise.models import Department
 
 
 class Category(models.Model):
@@ -70,6 +71,11 @@ class Product(models.Model):
     description = models.TextField('Описание', blank=True)
     identifier_1C = models.CharField(
         'Идентификатор 1С', max_length=50, blank=True, db_index=True
+    )
+    departments = models.ManyToManyField(
+        Department,
+        verbose_name='Подразделения',
+        related_name='department_products'
     )
 
     class Meta:

@@ -4,6 +4,18 @@ from django.utils.html import format_html
 from .models import Category, Product, ProductImage
 from prices.models import Price
 
+class DepartmentInLine(admin.TabularInline):
+    model = Product.departments.through
+    extra = 0
+    verbose_name = 'Подразделение'
+    verbose_name_plural = 'Подразделения'
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'departments':
+            product = Product.objects.get(pk=request.resolver_match.kwargs['object_id'])
+            kwargs['queryset'] = product.departments.all()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class ProductImageInLine(admin.TabularInline):
     model = ProductImage
@@ -93,6 +105,7 @@ class ProductAdmin(admin.ModelAdmin):
         'stock',
     ]
     inlines = [
+        DepartmentInLine,
         ProductImageInLine,
         PriceInLine,
     ]
