@@ -16,6 +16,7 @@ from django.core.paginator import PageNotAnInteger
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
+from contextlib import suppress
 from rest_framework.serializers import ModelSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -121,7 +122,7 @@ class OrdersView(ListView):
         queryset = Order.objects.filter(
             department=department_instance.department,
             customer=self.request.user
-        )
+        ).exclude(status='completed').order_by('-created_at')
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -399,3 +400,33 @@ def unload_orders(request, *args, **kwargs):
 
     return JsonResponse(serialized_orders, status=200, safe=False)
  
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_order(request, *args, **kwargs):
+    order_id = request.query_params.get('id')
+    order_status = request.query_params.get('status')
+
+    with suppress(ValidationError):
+        if order_id and order_status:
+            order = Order.objects.filter(id=order_id)
+            if not order:
+                raise ValidationError   
+            order.update(**{
+                'status': order_status,
+            })
+        else:
+            raise ValidationError
+        return JsonResponse(
+            {'replay': 'ok'},
+            status=200,
+            safe=False,
+            json_dumps_params={'ensure_ascii': False}
+        )
+
+    return JsonResponse(
+        {'replay': 'error', 'message': 'Не найден заказ'},
+        status=400,
+        safe=False,
+        json_dumps_params={'ensure_ascii': False}
+    )

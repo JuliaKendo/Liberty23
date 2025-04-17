@@ -34,6 +34,6 @@ urlpatterns = [
     path('export/<order_id>', views.unload_orders),
     path('export/<data:data_from>', views.unload_orders),
     path('export/<data:data_from>/<data:data_to>', views.unload_orders),
-
+    path('import', views.download_order),
     path('payment/result', views.handle_result_payment),
 ]
