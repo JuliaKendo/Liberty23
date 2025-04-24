@@ -85,6 +85,34 @@ class News(models.Model):
         return self.picture.url
 
 
+class Appeal(models.Model):
+    title = models.CharField('Заголовок', max_length=200, db_index=True)
+    name = models.CharField('Имя', max_length=200, db_index=True)
+    phone = PhoneNumberField('Телефон', db_index=True)
+    email = models.EmailField('email', db_index=True, blank=True)
+    content = models.TextField('Содержание обращения', blank=True)
+    status = models.CharField(
+        'Статус',
+        max_length=10,
+        default='new',
+        db_index=True,
+        choices=(
+            ('new', 'Новое'),
+            ('reviewed', 'Рассмотренно'),
+    ))
+    created_at = models.DateTimeField(
+        'Дата создания', db_index=True, auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Обращение'
+        verbose_name_plural = 'Обращения'
+    
+    def __str__(self):
+        return self.title
+    
+
+
 class Department(models.Model):
     name = models.CharField('Наименование', max_length=200, db_index=True)
     identifier_1C = models.CharField('Идентификатор 1С', max_length=50, blank=True, db_index=True)

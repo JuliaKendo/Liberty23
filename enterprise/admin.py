@@ -3,7 +3,15 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django_summernote.admin import SummernoteModelAdmin
 
-from .models import Contacts, News, Department, PaymentSetup, EnterpriseSetting, IntegrationSettings
+from .models import (
+    Contacts,
+    News,
+    Appeal,
+    Department,
+    PaymentSetup,
+    EnterpriseSetting,
+    IntegrationSettings
+)
 from prices.models import DeliveryPrice
 
 
@@ -61,6 +69,31 @@ class NewsAdmin(SummernoteModelAdmin):
             return '(No image)'
 
     render_preview.short_description = 'Preview'
+
+
+@admin.register(Appeal)
+class AppealAdmin(SummernoteModelAdmin):
+    search_fields = ['title', 'name', 'phone', 'email']
+    list_display = [
+        'status',
+        'title',
+        'name',
+        'phone',
+        'email',
+        'created_at',
+    ]
+    summernote_fields = ('content',)
+    fields = [
+        'status',
+        'title',
+        'name',
+        ('phone', 'email'),
+        'content',
+        'created_at',
+    ]
+    readonly_fields = ('created_at',)
+
+    list_display_links = list_display
 
 
 @admin.register(Department)

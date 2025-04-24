@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .forms import SignUpForm
+from enterprise.forms import AppealForm
 
 
 def signup(request):
@@ -53,3 +54,8 @@ class AuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email
         })
+
+
+def contact(request):
+    appeal_form = AppealForm()
+    return render(request, 'contact.html', context={'form': appeal_form})

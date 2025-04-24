@@ -26,7 +26,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('', render, kwargs={'template_name': 'index.html'}, name='start_page'),
     path('about', render, kwargs={'template_name': 'about.html'}, name='about_page'),
-    path('contact', render, kwargs={'template_name': 'contact.html'}, name='contact_page'),
+    path('contact', views.contact, name='contact_page'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', views.signup, name='signup'),
     path('accounts/profile/', views.profile, name='profile'),

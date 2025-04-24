@@ -28,26 +28,30 @@
             <h3>У вас есть вопросы? <br>
                 Напишите нам сообщение</h3>
         </div>
-        <form action="{% static '/inc/sendemail.php' %}" class="contact-form-validated contact-one__form">
+        <form method="post" action="{% url 'enterprise:appeal' %}" class="contact-form-validated contact-one__form">
+            {% csrf_token %}
             <div class="row">
                 <div class="col-md-6">
-                    <input type="text" name="name" placeholder="Ваше имя">
+                    {{ form.name }}
                 </div>
                 <div class="col-md-6">
-                    <input type="text" placeholder="Email" name="email">
+                    {{ form.phone }}
                 </div>
                 <div class="col-md-6">
-                    <input type="text" placeholder="Телефон" name="phone">
+                    {{ form.email }}
                 </div>
                 <div class="col-md-6">
-                    <input type="text" placeholder="Тема собщения" name="subject">
+                    {{ form.title }}
                 </div>
                 <div class="col-md-12">
-                    <textarea placeholder="Текст собщения" name="message"></textarea>
+                    {{ form.content }}
+                </div>
+                <div class="col-md-12">
+                    {{ form.status }}
                 </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="thm-btn">Отправить</button>
-                </div>
+                </div> 
             </div>
         </form>
     </div>

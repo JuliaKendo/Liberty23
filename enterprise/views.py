@@ -1,13 +1,16 @@
 import hashlib
 import requests
 from contextlib import suppress
-from django.shortcuts import render, redirect
+from django.db import transaction
 from django.conf import settings
 from django.http import JsonResponse
+from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from django.core.exceptions import ValidationError
+from django.views.decorators.http import require_POST
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -19,7 +22,7 @@ from requests.exceptions import HTTPError, ConnectionError
 import xml.etree.ElementTree as ET
 
 from .models import News, Department, PaymentSetup
-from .forms import DepartmentsForm
+from .forms import DepartmentsForm, AppealForm
 from .departments import СurrentDepartment
 from orders.library import check_order_status
 
@@ -81,6 +84,28 @@ class NewsView(ListView):
         context['MEDIA_URL'] = settings.MEDIA_URL
 
         return context
+
+
+@require_POST
+def appeal_add(request):
+    try:
+        with transaction.atomic(): 
+            appeal_form = AppealForm({k: v[0] for k, v in request.POST.lists()})
+            if appeal_form.is_valid():  
+                appeal_instance = appeal_form.save(commit=False)
+                appeal_instance.save()
+            else:
+                raise ValidationError(appeal_form.errors)
+
+    except ValidationError as errors:
+        transaction.rollback()
+        return render(request, 'contact.html', context={'form': appeal_form})
+
+    finally:
+        if transaction.get_autocommit():
+            transaction.commit()
+
+    return render(request, 'contact.html', context={'form': AppealForm()})
 
 
 @api_view(['POST'])
