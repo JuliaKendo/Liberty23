@@ -85,6 +85,18 @@ cd Liberty23
 
 `LOG_ENV` - вид окружения для логов (development или production)
 
+`EMAIL_HOST` - адрес smtp сервера.
+
+`EMAIL_PORT` - порт smtp сервера.
+
+`EMAIL_HOST_USER` - имя пользователя от которого отправляется почта.
+
+`EMAIL_HOST_PASSWORD` - пароль почты.
+
+`EMAIL_USE_TLS` - TLS (по умолчанию не используется)
+
+`EMAIL_USE_SSL` - SSL (по умолчанию включено)
+
 
 Установите зависимости в виртуальное окружение:
 ```sh
@@ -142,6 +154,18 @@ python manage.py runserver
 `TG_CHART_ID`= id пользователя или группы телеграмм
 
 `LOG_ENV` - вид окружения для логов (development или production)
+
+`EMAIL_HOST` - адрес smtp сервера.
+
+`EMAIL_PORT` - порт smtp сервера.
+
+`EMAIL_HOST_USER` - имя пользователя от которого отправляется почта.
+
+`EMAIL_HOST_PASSWORD` - пароль почты.
+
+`EMAIL_USE_TLS` - TLS (по умолчанию не используется)
+
+`EMAIL_USE_SSL` - SSL (по умолчанию включено)
 
 Запустите развертывание сайта в Docker:
 

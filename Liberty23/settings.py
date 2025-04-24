@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     'enterprise',
 
     'django_rq',
+
+    'mailings',
 ]
 
 MIDDLEWARE = [
@@ -207,6 +209,13 @@ DEPARTMENT_SESSION_ID = 'department'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 SUMMERNOTE_THEME = 'bs4'
 
+# EMAIL settings
+EMAIL_HOST = env('EMAIL_HOST', '')
+EMAIL_PORT = env.int('EMAIL_PORT', 465)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', False)
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', True)
 
 #Logging
 LOGGING = {
