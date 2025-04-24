@@ -36,20 +36,15 @@ class OutgoingMailSentFilter(admin.SimpleListFilter):
             return queryset.filter(sent_date__isnull=True)
 
 
-# class CustomerSegmentsInline(admin.TabularInline):
-
-#     extra = 0
-#     model = MailingOfLetters.segment.through
-#     verbose_name = 'Сегмент'
-#     verbose_name_plural = 'Сегменты'
-
-
 @admin.register(NotifyTemplate)
 class NotifyTemplateAdmin(SummernoteModelAdmin):
     search_fields = ['name', ]
     list_display = ['name', ]
     summernote_fields = ('header_template', 'footer_template',)
     fields = ['name', 'header_template', 'footer_template',]
+
+    def has_module_permission(self, request):
+        return False
 
 
 @admin.register(OutgoingMail)
@@ -135,3 +130,7 @@ class MailingOfLettersAdmin(SummernoteModelAdmin):
         elif obj and obj.status == MailingOfLetters.NEW and 'segment' in fields:
             fields.remove('segment')
         return fields
+
+
+    def has_module_permission(self, request):
+        return False
