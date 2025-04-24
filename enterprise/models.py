@@ -110,7 +110,6 @@ class Appeal(models.Model):
     
     def __str__(self):
         return self.title
-    
 
 
 class Department(models.Model):
@@ -154,6 +153,8 @@ class EnterpriseSetting(SingletonModel):
 class IntegrationSettings(SingletonModel):
     name = models.CharField('Наименование', max_length=150)
     link = models.URLField('Ссылка', max_length = 250)
+    login = models.CharField('Логин', max_length = 350, blank=True)
+    password = models.CharField('Пароль', max_length = 128, blank=True)
 
     class Meta:
         verbose_name = "Настройка интеграции"

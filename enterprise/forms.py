@@ -1,8 +1,27 @@
 from django import forms
 
-from .models import Department, Appeal
+from .models import Department, Appeal, PaymentSetup, IntegrationSettings
 
-        
+
+class CustomIntegrationForm(forms.ModelForm):
+    class Meta:
+        model = IntegrationSettings
+        fields = '__all__'
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+
+
+class PasswordInputForm(forms.ModelForm):
+    class Meta:
+        model = PaymentSetup
+        fields = '__all__'
+        widgets = {
+            'password1': forms.PasswordInput(),
+            'password2': forms.PasswordInput(),
+        }
+
+
 class DepartmentsForm(forms.ModelForm):
     departments = forms.ModelChoiceField(
         queryset=Department.objects.all(),

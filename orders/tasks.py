@@ -1,4 +1,5 @@
 import json
+import base64
 import requests
 from contextlib import suppress
 from django_rq import get_queue
@@ -42,8 +43,13 @@ def launch_update_of_stoks(order_id):
     for integration_setting in integration_settings:
         if not integration_setting.link: continue
         url = integration_setting.link.replace('{order_id}', str(order_id))
+        headers = {}
+        if integration_setting.login:
+            auth = base64.b64encode(f'{integration_setting.login}:{integration_setting.password}'.encode('utf-8')).decode("utf-8")
+            headers = {"Authorization": f"Basic {auth}"}
         try:
-            response = requests.get(url)
+            print(f'Authorization: {integration_setting.login}:{integration_setting.password} - {headers}')
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
             if response.text !='Success':
                 raise ErrorUpdateOfStoks(response.text)

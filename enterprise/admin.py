@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from django_summernote.admin import SummernoteModelAdmin
@@ -12,6 +11,7 @@ from .models import (
     EnterpriseSetting,
     IntegrationSettings
 )
+from .forms import CustomIntegrationForm, PasswordInputForm
 from prices.models import DeliveryPrice
 
 
@@ -106,16 +106,6 @@ class DepartmentAdmin(admin.ModelAdmin):
     inlines = [DeliveryPriceInLine,]
 
 
-class PasswordInputForm(forms.ModelForm):
-    class Meta:
-        model = PaymentSetup
-        fields = '__all__'
-        widgets = {
-            'password1': forms.PasswordInput(),
-            'password2': forms.PasswordInput(),
-        }
-
-
 @admin.register(PaymentSetup)
 class PaymentSetupAdmin(admin.ModelAdmin):
     form = PasswordInputForm
@@ -150,6 +140,7 @@ class EnterpriseSettingAdmin(admin.ModelAdmin):
 
 @admin.register(IntegrationSettings)
 class IntegrationSettingsAdmin(admin.ModelAdmin):
+    form = CustomIntegrationForm
     search_fields = [
         'name',
         'link',
@@ -161,5 +152,6 @@ class IntegrationSettingsAdmin(admin.ModelAdmin):
     fields = [
         'name',
         'link',
+        ('login', 'password'),
     ]
     list_display_links = list_display
