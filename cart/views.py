@@ -3,6 +3,7 @@ from contextlib import suppress
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 from .cart import Cart, QuantityOverStock, BasketOverWeight
 from .forms import CartAddProductForm
@@ -76,6 +77,7 @@ def cart_remove(request, product_id):
     return redirect('cart:cart_detail')
 
 
+@login_required(login_url='/')
 def cart_detail(request):
     cart = Cart(request)
     return render(

@@ -1,4 +1,22 @@
-
+<style>
+    .custom__checkbox {
+        width: 15px;
+        height: 15px;
+        border: none;
+        display: inline-block;
+        cursor: pointer;
+        background-color: white;
+        border-radius: 3px;
+    }
+    .checkbox__active {
+        width: 11px;
+        height: 11px;
+        margin: auto;
+        margin-top: 2px;
+        background-size: contain;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3c?xml version='1.0' encoding='iso-8859-1'?%3e%3c!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --%3e%3csvg fill='%23000000' height='800px' width='800px' version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 128.411 128.411' xml:space='preserve'%3e%3cg%3e%3cg%3e%3cpolygon points='127.526,15.294 45.665,78.216 0.863,42.861 0,59.255 44.479,113.117 128.411,31.666 '/%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3c/g%3e%3c/svg%3e");
+    }
+</style>
 <div class="login__overlay login__toggler"></div>
 <div class="login__content">
     <div class="login__top">
@@ -36,8 +54,39 @@
                 <div class="error">{{ form.password2.errors }}</div>
             {% endif %}
         </div>
-        <button type="submit" class="thm-btn" style="margin-top: 100px;">Зарегистрироваться</button>
+        <button type="submit" class="thm-btn" style="margin-top: 30px;">Зарегистрироваться</button>
+        <div class="login__terms">
+            {{ form.agree_to_terms }}
+            <div class="custom__checkbox" name="custom__checkbox" onclick="toggleCheckbox(this);">
+                <div class="checkbox__active" style="display: none;"></div>
+            </div>
+            <a 
+                href="javascript:void(0);"
+                name="agree_to_terms"
+                onclick="window.open('{% url 'terms_of_service' %}', '_blank');"
+                style="padding-left: 5px;">
+                <label for="id_agree_to_terms" style="margin-bottom: 0px;"> 
+                    Принимаю условия предоставления услуг 
+                </label>
+            </a>
+        </div>
+        {% if form.agree_to_terms.errors %}
+            <div class="error">{{ form.agree_to_terms.errors }}</div>
+        {% endif %}
     </form>
-
+    <img src="" alt="">
 </div><!-- /.login__content -->
+<script>
+    function toggleCheckbox(custom__checkbox) {
+        debugger;
+        const checkbox = document.querySelector('input[type="checkbox"]');
+        const activeCheckbox = document.querySelector('.checkbox__active');
+        checkbox.checked = !checkbox.checked;
+        if (checkbox.checked) {
+            activeCheckbox.style.display = "block";    
+        } else {
+            activeCheckbox.style.display = "none";
+        }  
+    }
+</script>
 

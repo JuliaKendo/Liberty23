@@ -421,6 +421,13 @@
     });
   }
   if ($(".signup__toggler").length) {
+
+    // console.log('agree_to_terms');
+    // $("a[name='agree_to_terms']").on("click", function (e) {
+    //   e.preventDefault();
+    //   console.log('agree_to_terms');
+    // });
+  
     $(".signup__toggler").on("click", function (e) {
       e.preventDefault();
       updateLoginForm('/accounts/signup/');
@@ -509,6 +516,23 @@
       });
 
     });
+  }
+  if ($('input[type="checkbox"]').length) {
+    console.log('checkbox');
+    $('input[type="checkbox"]').on('change', function (e) {
+      e.preventDefault();
+      console.log('checkbox1');
+    });
+  }
+  if ($('div[name="custom__checkbox"]').length) {
+    $('div[name="custom__checkbox"]').on('click', function (e) {
+      e.preventDefault();
+      console.log(e);
+    });
+  }
+  function openLink(url) {
+    console.log(url);
+    window.open(url, "_blank");
   }
   function waitForDialog(element, timeout = 60000) {
     let elapsed = 0;

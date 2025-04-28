@@ -10,6 +10,7 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.files.base import ContentFile
 from django.views.generic import ListView, DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from contextlib import suppress
 from more_itertools import first
 from rest_framework import status
@@ -30,8 +31,9 @@ from prices.models import Price
 from cart.cart import Cart
 
 
-class FiltersView(TemplateView):
+class FiltersView(LoginRequiredMixin, TemplateView):
     template_name = 'components/products/filters.html'
+    login_url = '/'
 
     def get_filter(self, qs=None, func='', field='', *groups, **kwargs):
         if qs: 
@@ -133,12 +135,13 @@ class ProductsView(FiltersView, ListView):
         return context
 
 
-class ProductCardView(DetailView):
+class ProductCardView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = 'product-details.html'
     slug_url_kwarg = 'id'
     slug_field = 'pk'
     context_object_name = 'product'
+    login_url = '/'
 
     def get_similar_products(self, product):
         result = re.sub(r'\b\w{1,5}\b', '', product.name)

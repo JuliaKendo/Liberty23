@@ -8154,7 +8154,7 @@ h6 {
 
 .login__title {
   margin: 0;
-  color: #fff;
+  color: hsl(0, 0%, 100%);
   font-size: 20px;
   line-height: 1;
 }
@@ -8188,6 +8188,24 @@ h6 {
   margin-bottom: 1px!important;
   font-size: 15px;
   font-style: italic;
+}
+
+.login__terms {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--thm-color);
+  margin-top: 20px;
+  /* margin-left: 20px; */
+}
+
+.login__terms a {
+  color: var(--thm-color);
+}
+
+.login__terms a:hover {
+  color: var(--thm-base);
 }
 
 

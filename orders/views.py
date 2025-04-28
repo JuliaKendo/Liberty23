@@ -16,6 +16,7 @@ from django.core.paginator import PageNotAnInteger
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from contextlib import suppress
 from rest_framework.serializers import ModelSerializer
 from rest_framework.decorators import api_view, permission_classes
@@ -110,12 +111,13 @@ class OrderSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class OrdersView(ListView):
+class OrdersView(LoginRequiredMixin, ListView):
     model = Order
     template_name = 'orders.html'
     context_object_name = 'orders'
     allow_empty = True
     paginate_by = 10
+    login_url = '/'
 
     def get_queryset(self):
         department_instance = СurrentDepartment(self.request)
@@ -145,8 +147,9 @@ class OrdersView(ListView):
         return context
 
 
-class CheckoutView(TemplateView):
+class CheckoutView(LoginRequiredMixin, TemplateView):
     template_name = 'checkout.html'
+    login_url = '/'
 
     def get_context_data(self, **kwargs): 
         context = super().get_context_data(**kwargs)
