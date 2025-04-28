@@ -19,20 +19,20 @@
 
 <section class="about-one">
     <div class="container">
-        {% for current_news in news %}
+        {% for current_info in info %}
         <div class="row">
-            {% if current_news.picture %}
+            {% if current_info.picture %}
                 <div class="col-md-12 col-lg-6">
-                    <img src="{{ current_news.get_image }}" class="img-fluid" alt="">
+                    <img src="{{ current_info.get_image }}" class="img-fluid" alt="">
                 </div>
                 <div class="col-md-12 col-lg-6">
                     <div class="about-one__content">
                         <div class="block-title text-left">
                             <div class="block-title__decor"></div>
-                            <p>{{ current_news.created_at }}</p>
-                            <h3>{{ current_news.title }}</h3>
+                            <p>{{ current_info.created_at }}</p>
+                            <h3>{{ current_info.title }}</h3>
                         </div>
-                        {{ current_news.content|html_content }}
+                        {{ current_info.content|html_content }}
                     </div>
                 </div>
             {% else %}
@@ -40,10 +40,10 @@
                     <div class="about-one__content">
                         <div class="block-title text-left">
                             <div class="block-title__decor"></div>
-                            <p>{{ current_news.created_at }}</p>
-                            <h3>{{ current_news.title }}</h3>
+                            <p>{{ current_info.created_at }}</p>
+                            <h3>{{ current_info.title }}</h3>
                         </div>
-                        {{ current_news.content|html_content }}
+                        {{ current_info.content|html_content }}
                     </div>
                 </div>
             {% endif %}
@@ -53,8 +53,7 @@
 
         <div class="row common-pagination">
             {% include "components/common/paginator.html" with paginator=paginator page_obj=page_obj %}
-        </div>        
-
+        </div>
     </div>
 </section>
 

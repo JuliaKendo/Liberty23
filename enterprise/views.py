@@ -21,7 +21,7 @@ from rest_framework.serializers import ModelSerializer, ListSerializer
 from requests.exceptions import HTTPError, ConnectionError
 import xml.etree.ElementTree as ET
 
-from .models import News, Department, PaymentSetup
+from .models import News, Department, PaymentSetup, Info
 from .forms import DepartmentsForm, AppealForm
 from .departments import СurrentDepartment
 from orders.library import check_order_status
@@ -80,7 +80,38 @@ class NewsView(ListView):
         except EmptyPage:
             news_page = paginator.page(paginator.num_pages)
 
-        context['products']  = news_page
+        context['news']  = news_page
+        context['MEDIA_URL'] = settings.MEDIA_URL
+
+        return context
+
+
+class InfoView(ListView):
+    model = Info
+    template_name = 'info.html'
+    context_object_name = 'info'
+    allow_empty = True
+    paginate_by = 1
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.order_by('-created_at')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.object_list = self.get_queryset()
+        context = super().get_context_data(**kwargs)
+
+        paginator = Paginator(context['info'], self.paginate_by)
+        page = self.request.GET.get('page')
+        
+        try:
+            info_page = paginator.page(page)
+        except PageNotAnInteger:
+            info_page = paginator.page(1)
+        except EmptyPage:
+            info_page = paginator.page(paginator.num_pages)
+
+        context['info']  = info_page
         context['MEDIA_URL'] = settings.MEDIA_URL
 
         return context

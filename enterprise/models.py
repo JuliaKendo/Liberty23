@@ -159,3 +159,23 @@ class IntegrationSettings(SingletonModel):
     class Meta:
         verbose_name = "Настройка интеграции"
         verbose_name_plural = "Настройки интеграции"
+
+
+class Info(models.Model):
+    title = models.CharField('Заголовок', max_length=200, db_index=True)
+    picture = models.ImageField('Изображение', upload_to='pictures_news', null=True, blank=True)
+    content = models.TextField('Содержание', blank=True)
+    created_at = models.DateTimeField(
+        'Дата создания', db_index=True, auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Информация'
+        verbose_name_plural = 'Информация'
+    
+    def __str__(self):
+        return self.title
+    
+    @property
+    def get_image(self):
+        return self.picture.url

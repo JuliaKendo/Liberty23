@@ -12,4 +12,5 @@ urlpatterns = [
     path('departments', views.departments, name='departments'),
     path('payments/params', views.get_payment_params),
     path('payments/check', views.check_payment),
+    path('info', views.InfoView.as_view(), name='info'),
 ]
