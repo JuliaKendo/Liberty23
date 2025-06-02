@@ -1,5 +1,6 @@
 env
 venv
+fixtures
 .python-version
 .venv
 .virtualenv
@@ -31,3 +32,4 @@ certbot
 *.json
 package-lock.json
 !package.json
+dump_fixtures.sh
