@@ -73,6 +73,8 @@ cd Liberty23
 
 `ALLOWED_PORT` - порт хоста, если есть
 
+`POSTGRES_PASSWORD` - пароль postgres сервера
+
 `REDIS_HOST` - адрес redis сервера, или наименование соответствующего контейнера docker
 
 `REDIS_PORT` - порт redis
@@ -142,6 +144,8 @@ python manage.py runserver
 `DB_HOST` - имя или ip адрес хоста на котором располагается база данных (в случае развертывания в docker тут пишем имя соответствующего сервиса из docker-compose)
 
 `DB_PORT` - порт на котором развернута база данных на хосте
+
+`POSTGRES_PASSWORD` - пароль postgres сервера
 
 `REDIS_HOST` - адрес redis сервера, или наименование соответствующего контейнера docker
 
