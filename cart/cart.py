@@ -111,7 +111,8 @@ class Cart(object):
     def get_weight_limit(self):
         with suppress(EnterpriseSetting.DoesNotExist):
             enterprise_setting = EnterpriseSetting.objects.first()
-            return enterprise_setting.max_cart_weght
+            if enterprise_setting:
+                return enterprise_setting.max_cart_weght
 
     def add(self, product, quantity=1, price=0, update_quantity=False):
         product_id = str(product.id)
