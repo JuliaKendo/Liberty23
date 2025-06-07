@@ -55,7 +55,10 @@ services:
       - redis
 
   nginx:
-    build: ./nginx
+    build: 
+      context: ./nginx
+      args:
+        APP_ENV: ${APP_ENV}
     volumes:
       - static_volume:/home/app/web/staticfiles
       - media_volume:/home/app/web/mediafiles
