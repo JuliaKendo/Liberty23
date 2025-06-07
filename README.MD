@@ -85,7 +85,7 @@ cd Liberty23
 
 `TG_CHART_ID` - id пользователя или группы телеграмм
 
-`LOG_ENV` - вид окружения для логов (development или production)
+`APP_ENV` - вид окружения (dev или prod)
 
 `EMAIL_HOST` - адрес smtp сервера.
 
@@ -157,7 +157,7 @@ python manage.py runserver
 
 `TG_CHART_ID`= id пользователя или группы телеграмм
 
-`LOG_ENV` - вид окружения для логов (development или production)
+`APP_ENV` - вид окружения (dev или prod)
 
 `EMAIL_HOST` - адрес smtp сервера.
 

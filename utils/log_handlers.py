@@ -49,7 +49,7 @@ class TelegramLogFormatter(logging.Formatter):
         level_name = record.levelname
         log_message = record.getMessage()
         log_location = f"{record.pathname}:{record.lineno}"
-        log_environment = settings.LOG_ENV
+        log_environment = settings.APP_ENV
 
         if record.exc_info:
             exc_type, exc_value, exc_tb = record.exc_info

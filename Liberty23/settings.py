@@ -39,7 +39,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
 
 ALLOWED_PORT = env('ALLOWED_PORT', '')
 
-LOG_ENV = env('LOG_ENV', 'development' if DEBUG else 'production')
+APP_ENV = env('APP_ENV', 'development' if DEBUG else 'production')
 
 # Application definition
 
