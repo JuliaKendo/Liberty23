@@ -35,7 +35,9 @@ DEBUG = env.bool('DEBUG', True)
 # ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
-# CSRF_TRUSTED_ORIGINS = ['http://', 'https://']
+
+if env('APP_ENV') == "prod":
+    CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', ['http://', 'https://'])
 
 ALLOWED_PORT = env('ALLOWED_PORT', '')
 

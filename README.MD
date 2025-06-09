@@ -129,7 +129,7 @@ python manage.py runserver
 
 `ALLOWED_HOSTS` - см [Django docs](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts).
 
-`ALLOWED_PORT` - порт хоста, если есть
+`CSRF_TRUSTED_ORIGINS` - устанавливает определенные адреса в качестве доверенных для запросов к сайту (пр. "http://, httpы://")
 
 `DATABASE` - имя, используемое в sh скрипте для определения типа базы данных (пр. postgres)
 
