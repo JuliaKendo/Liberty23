@@ -4716,15 +4716,31 @@ h6 {
   margin-top: 50px;
 }
 
+.about-one__content .img-float {
+  margin-bottom: 15px;
+}
+
 @media (min-width: 992px) {
   .about-one__content {
     margin-top: 0;
+  }
+  .about-one__content .img-float {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    max-width: 40%;
   }
 }
 
 @media (min-width: 1200px) {
   .about-one__content {
     padding-left: 70px;
+  }
+  .about-one__content .img-float {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    max-width: 40%;
   }
 }
 

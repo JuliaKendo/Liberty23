@@ -22,18 +22,14 @@
         {% for current_info in info %}
         <div class="row">
             {% if current_info.picture %}
-                <div class="col-md-12 col-lg-6">
-                    <img src="{{ current_info.get_image }}" class="img-fluid" alt="">
-                </div>
-                <div class="col-md-12 col-lg-6">
-                    <div class="about-one__content">
-                        <div class="block-title text-left">
-                            <div class="block-title__decor"></div>
-                            <p>{{ current_info.created_at }}</p>
-                            <h3>{{ current_info.title }}</h3>
-                        </div>
-                        {{ current_info.content|html_content }}
+                <div class="about-one__content">
+                    <img src="{{ current_info.get_image }}" class="img-fluid img-float" alt="">
+                    <div class="block-title text-left">
+                        <div class="block-title__decor"></div>
+                        <p>{{ current_info.created_at }}</p>
+                        <h3>{{ current_info.title }}</h3>
                     </div>
+                    {{ current_info.content|html_content }}
                 </div>
             {% else %}
                 <div class="col-md-12 col-lg-12">
