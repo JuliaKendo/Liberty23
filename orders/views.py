@@ -173,15 +173,23 @@ class PreOrderView(CheckoutView):
             with transaction.atomic():
                 for item in cart:
                     product = get_object_or_404(Product, pk=item['product']['id'])
-                    basket.append(
-                        Basket(
-                            user=user,
-                            product=product,
-                            unit=product.unit,
-                            quantity=item['quantity'],
+                    product_ordered = Basket.objects.filter(user=user, product=product, unit=product.unit)
+                    if not product_ordered.exists():
+                        basket.append(
+                            Basket(
+                                user=user,
+                                product=product,
+                                unit=product.unit,
+                                quantity=item['quantity'],
+                                price=item['price'],
+                                sum=item['total_price'])
+                        )
+                    else:
+                        product_ordered.update(
+                            quantity=product_ordered.first().quantity + item['quantity'],
                             price=item['price'],
-                            sum=item['total_price'])
-                    )
+                            sum=float(product_ordered.first().sum) + item['total_price']
+                        )
             if basket:
                 Basket.objects.bulk_create(basket)
         except Exception:
