@@ -2523,6 +2523,11 @@ h6 {
   display: flex;
 }
 
+.mobile-nav__content .logo-box h1 {
+    color: var(--thm-base);
+    margin-top: 30px;
+}
+
 .mobile-nav__close {
   position: absolute;
   top: 20px;
