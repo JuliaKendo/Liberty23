@@ -974,13 +974,8 @@
   }
   function createOrder(status='introductory') {
     let $form = $('#primary-form');
-    let $additionalForm = $('#additional-form'); let additional_info = NaN;
-    if ($additionalForm.find('input[name="address"]').val())
-      $form = $additionalForm;
-    else {
-      additional_info = $("textarea[name='notes']").val()
-    }
     const formData = new FormData($form[0]);
+    const additional_info = $("textarea[name='notes']").val();
     if (additional_info) formData.append('additional_info', additional_info);
     formData.append('status', status);
     return $.ajax({

@@ -24,6 +24,7 @@ urlpatterns = [
     path('', views.OrdersView.as_view(), name='list'),
     path('checkout', views.CheckoutView.as_view(), name='checkout'),
     path('pre-order', views.PreOrderView.as_view(), name='pre-order'),
+    re_path(r'^pre-order/remove/(?P<product_id>\d+)/$', views.remove_from_basket, name='remove_from_basket'),
     re_path(r'^order/(?P<order_id>\d+)/$', views.OrderView.as_view(), name='order'),
     re_path(r'^add/$', views.order_add, name='add'),
     re_path(r'^remove/$', views.order_remove, name='remove'),

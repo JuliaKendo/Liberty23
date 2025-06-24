@@ -160,6 +160,7 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
             context['delivery_price'] = get_delivery_price(self.request)
         context['order'] = Order.objects.none()
         context['ready_for_payment'] = True
+        context['read_only'] = False
         return context
 
 
@@ -209,6 +210,7 @@ class PreOrderView(CheckoutView):
         user = self.request.user
         if user:
             context['basket'] = Basket.objects.filter(user=user).annotate(sum__sum=Sum('sum'))
+        context['read_only'] = False
 
         return context
 
@@ -223,6 +225,7 @@ class OrderView(CheckoutView):
         context['ready_for_payment'] = False
         context['order'] = get_object_or_404(Order, pk=order_id)
         context['basket'] = OrderItem.objects.filter(order__pk=order_id)
+        context['read_only'] = True
         return context
 
 
@@ -249,6 +252,13 @@ def create_user_and_login(request, param):
     raise ValidationError(form.errors)
 
 
+def remove_from_basket(request, product_id):
+    user = request.user
+    product = get_object_or_404(Product, id=product_id)
+    Basket.objects.filter(user=user, product=product).delete()
+    return redirect('orders:pre-order')
+
+
 @require_POST
 @planed_update_of_stoks()
 def order_add(request):
@@ -268,8 +278,28 @@ def order_add(request):
                 if create_account:
                     user = create_user_and_login(request, delivery_addresses_form.cleaned_data)
 
-                delivery_addresses_instance = delivery_addresses_form.save(commit=False)
-                delivery_addresses_instance.customer = user
+                try:
+                    delivery_addresses_instance = DeliveryAddresses.objects.get(customer=user)
+                    delivery_addresses_instance.__dict__.update(
+                        **{
+                            key: value for \
+                            key, value in \
+                            delivery_addresses_form.cleaned_data.items() if key in [
+                                'country',
+                                'fname',
+                                'lname',
+                                'company',
+                                'address',
+                                'town',
+                                'state',
+                                'zip',
+                                'email',
+                                'phone',
+                                'date_of_birth'
+                    ]})
+                except DeliveryAddresses.DoesNotExist:
+                    delivery_addresses_instance = delivery_addresses_form.save(commit=False)
+                    delivery_addresses_instance.customer = user
                 delivery_addresses_instance.save()
                 order_form = OrderForm({
                     'customer': user,

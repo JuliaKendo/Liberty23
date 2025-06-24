@@ -27,10 +27,50 @@
 		<h3 class="order-title">ВАШ ЗАКАЗ</h3>
 		<div class="row">
 			<div class="col-md-6">
-				<div class="order-details">
+				<table class="table cart-table">
+					<thead>
+						<tr>
+							<th>Товар</th>
+							<th>Стоимость</th>
+							{% if not read_only %}
+							<th>Удалить</th>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for cart_item in basket %}
+							{% with product=cart_item.product %}
+								<tr name="basket-row">
+									<td style="padding-top: 0px; padding-bottom: 0px;">{{ product.name }}</td>
+									{% if cart_item.sum %}
+										<td style="padding-top: 0px; padding-bottom: 0px;">{{ cart_item.sum|floatformat:2|intcomma }} руб.</td>
+									{% else %}
+										<td style="padding-top: 0px; padding-bottom: 0px;">0,00 руб.</td>
+									{% endif %}
+									{% if not read_only %}
+									<td style="padding-top: 0px; padding-bottom: 0px;">
+										<a name="remove-from-basket" href="{% url 'orders:remove_from_basket' product_id=product.id %}">
+											<i class="organik-icon-close remove-icon"></i>
+										</a>
+									</td>
+									{% endif %}
+								</tr>
+							{% endwith %}
+						{% endfor %}
+						{% if delivery_price and basket %}
+							<tr name="basket-row">
+								<td style="padding-top: 0px; padding-bottom: 0px;">Доставка</td>
+								<td style="padding-top: 0px; padding-bottom: 0px;">{{ delivery_price|floatformat:2|intcomma }} руб.</td>
+								<td style="padding-top: 0px; padding-bottom: 0px;"></td>
+							</tr>
+						{% endif %}
+					</tbody>
+				</table>
+				<!-- <div class="order-details">
 					<div class="order-details__top">
 						<p>Товар</p>
 						<p>Стоимость</p>
+						<p>Удалить</p>
 					</div>
 					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
 					{% for cart_item in basket %}
@@ -42,6 +82,9 @@
 								{% else %}
 									<span>0,00 руб.</span>
 								{% endif %}
+								<a name="remove-from-cart" href="{% url 'cart:remove' product_id=product.id %}">
+                                    <i class="organik-icon-close remove-icon"></i>
+                                </a>
 							</p>
 						{% endwith %}
 					{% endfor %}
@@ -49,9 +92,12 @@
 						<p>
 							<span>Доставка</span>
 							<span>{{ delivery_price|floatformat:2|intcomma }} руб.</span>
+							<a name="remove-from-cart" href="{% url 'cart:remove' product_id=product.id %}">
+								<i class="organik-icon-close remove-icon"></i>
+							</a>
 						</p>
 					{% endif %}
-				</div>
+				</div> -->
 			</div>
 			<div class="col-md-6">
 				{% if ready_for_payment %}
@@ -74,7 +120,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-6">
+			<div class="col-lg-12">
 				<h3>Детали заказа</h3>
 				{% with delivery_address=delivery_addresses|first %}
 				<form id="primary-form" action="{% url 'orders:add' %}" class="contact-form-validated contact-one__form">
@@ -87,37 +133,39 @@
 						</div>
 						<span class="col-md-12 text-danger text-error" name="username" style="display: none;"></span>
 						<div class="col-md-6">
-							<input type="text" name="fname" placeholder="Имя" value="{{ delivery_address.fname|default:'' }}">
+							{% if read_only %}
+								<input type="text" name="fname" placeholder="Имя" value="{{ delivery_address.fname|default:'' }}" disabled>
+							{% else %}
+								<input type="text" name="fname" placeholder="Имя" value="{{ delivery_address.fname|default:'' }}">
+							{% endif %}
 						</div>
 						<div class="col-md-6">
-							<input type="text" name="lname" placeholder="Фамилия" value="{{ delivery_address.lname|default:'' }}">
+							{% if read_only %}
+								<input type="text" name="lname" placeholder="Фамилия" value="{{ delivery_address.lname|default:'' }}" disabled>
+							{% else %}
+								<input type="text" name="lname" placeholder="Фамилия" value="{{ delivery_address.lname|default:'' }}">
+							{% endif %}
 						</div>
 						<div class="col-md-12">
-							<input type="text" name="company" placeholder="Компания" value="{{ delivery_address.company|default:'' }}">
+							{% if read_only %}
+								<input type="date" name="date_of_birth" placeholder="Дата пождения (ДД.ММ.ГГГГ)" value="{{ delivery_address.date_of_birth|default_if_none:'0001-01-01'|date:'Y-m-d' }}" disabled>
+							{% else %}
+								<input type="date" name="date_of_birth" placeholder="Дата пождения (ДД.ММ.ГГГГ)" value="{{ delivery_address.date_of_birth|default_if_none:'0001-01-01'|date:'Y-m-d' }}" >
+							{% endif %}
 						</div>
-						<span class="col-md-12 text-danger text-error" name="address" style="display: none;"></span>
 						<div class="col-md-12">
-							<input type="text" name="address" placeholder="Адрес" value="{{ delivery_address.address|default:'' }}">
+							{% if read_only %}
+								<input type="email" name="email" placeholder="email" value="{{ delivery_address.email|default:'' }}" disabled>
+							{% else %}
+								<input type="email" name="email" placeholder="email" value="{{ delivery_address.email|default:'' }}">
+							{% endif %}
 						</div>
-						<!-- <div class="col-md-12">
-							<input type="text" name="appartment" placeholder="Appartment, Unit, etc. (optional)">
-						</div> -->
 						<div class="col-md-12">
-							<input type="text" name="town" placeholder="Город" value="{{ delivery_address.town|default:'' }}">
-						</div>
-						<div class="col-md-6">
-							<input type="text" placeholder="Область / Край" name="state" value="{{ delivery_address.state|default:'' }}">
-						</div>
-						<div class="col-md-6">
-							<input type="text" placeholder="Индекс" name="zip" value="{{ delivery_address.zip|default:'' }}">
-						</div>
-						<span class="col-md-12 text-danger text-error" name="email" style="display: none;"></span>
-						<span class="col-md-12 text-danger text-error" name="phone" style="display: none;"></span>
-						<div class="col-md-6">
-							<input type="email" placeholder="Email" name="email" value="{{ delivery_address.email|default:'' }}">
-						</div>
-						<div class="col-md-6">
-							<input type="text" placeholder="Телефон" name="phone" value="{{ delivery_address.phone|default:'' }}">
+							{% if read_only %}
+								<textarea name="notes" placeholder="Дополнительная информация о заказе" disabled></textarea>
+							{% else %}
+								<textarea name="notes" placeholder="Дополнительная информация о заказе"></textarea>
+							{% endif %}
 						</div>
 						{% if not request.user.is_authenticated %}
 						<span class="col-md-12 text-danger text-error" name="createAccount" style="display: none;"></span>
@@ -132,55 +180,6 @@
 				</form>
 				{% endwith %}
 			</div>
-			<div class="col-lg-6">
-				<h3>
-					<input type="checkbox" id="shipDetails">
-					<label for="shipDetails">Адрес доставки, отличный от основного <sup>*</sup> :</label>
-				</h3>
-				<form id="additional-form" action="{% url 'orders:add' %}" class="contact-form-validated contact-one__form">
-					<div class="row">
-						{% csrf_token %}
-						<div class="col-md-12" style="display: none;">
-							<select class="selectpicker">
-								<option value="">РФ</option>
-							</select>
-						</div>
-						<div class="col-md-6">
-							<input type="text" name="fname" placeholder="Имя">
-						</div>
-						<div class="col-md-6">
-							<input type="text" name="lname" placeholder="Фамилия">
-						</div>
-						<div class="col-md-12">
-							<input type="text" name="company" placeholder="Компания">
-						</div>
-						<div class="col-md-12">
-							<input type="text" name="address" placeholder="Адрес">
-						</div>
-						<!-- <div class="col-md-12">
-							<input type="text" name="appartment" placeholder="Appartment, Unit, etc. (optional)">
-						</div> -->
-						<div class="col-md-12">
-							<input type="text" name="town" placeholder="Город">
-						</div>
-						<div class="col-md-6">
-							<input type="text" placeholder="Область / Край" name="state">
-						</div>
-						<div class="col-md-6">
-							<input type="text" placeholder="Индекс" name="zip">
-						</div>
-						<div class="col-md-6">
-							<input type="email" placeholder="Email" name="email">
-						</div>
-						<div class="col-md-6">
-							<input type="text" placeholder="Телефон" name="phone">
-						</div>
-						<div class="col-md-12">
-							<textarea name="notes" placeholder="Дополнительная информация о заказе"></textarea>
-						</div>
-					</div>
-				</form>
-			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12">
@@ -194,7 +193,7 @@
 						<input type="hidden" name="Culture" value="ru" />
 						<input type="hidden" name="Encoding" value="utf-8" />
 					</form>
-					{% if ready_for_payment %}
+					{% if ready_for_payment and not read_only %}
 						<a href="javascript:void(0);" class="thm-btn" id="submit-order" data-url="{% url 'catalog:products' %}" visibility="visibility">Заказать</a>
 					{% else %}
 						<a href="{% url 'orders:list' %}" class="thm-btn" visibility="visibility">Закрыть</a>

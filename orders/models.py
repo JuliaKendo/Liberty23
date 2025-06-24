@@ -27,13 +27,14 @@ class DeliveryAddresses(models.Model):
     email      = models.EmailField('email', blank=True)
     phone      = PhoneNumberField('Контактный телефон', blank=True)
     created_at = models.DateTimeField('Дата создания', db_index=True, auto_now_add=True)
+    date_of_birth = models.DateField('Дата рождения', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Адрес доставки'
         verbose_name_plural = 'Адреса доставки'
 
     def __str__(self):
-        return f'{self.lname} {self.fname} {self.address}'
+        return f'{self.lname} {self.fname} ({self.email})'
 
 
 class Order(models.Model):

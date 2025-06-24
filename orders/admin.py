@@ -73,26 +73,21 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(DeliveryAddresses)
 class DeliveryAddressesAdmin(admin.ModelAdmin):
-    search_fields = ['fname', 'lname', 'company', 'address', 'town', 'email', 'phone']
+    search_fields = ['fname', 'lname', 'email']
     list_display = [
         'customer',
         'fname',
         'lname',
-        'company',
-        'address',
-        'country',
-        'town',
-        'state',
-        'zip',
+        'date_of_birth',
         'email',
-        'phone',
     ]
     list_display_links = list_display
-    list_filter = ['country', 'town', 'state']
+    list_filter = ['fname', 'lname', 'date_of_birth', 'email']
     fields = [
         ('customer', 'created_at',),
         'fname',
         'lname',
+        'date_of_birth',
         'company',
         'address',
         'country',
