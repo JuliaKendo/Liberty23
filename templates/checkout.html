@@ -66,38 +66,6 @@
 						{% endif %}
 					</tbody>
 				</table>
-				<!-- <div class="order-details">
-					<div class="order-details__top">
-						<p>Товар</p>
-						<p>Стоимость</p>
-						<p>Удалить</p>
-					</div>
-					<span class="col-md-12 text-danger text-error" name="cartIsEmpty" style="display: none;"></span>
-					{% for cart_item in basket %}
-						{% with product=cart_item.product %}
-							<p>
-								<span>{{ product.name }}</span>
-								{% if cart_item.sum %}
-									<span>{{ cart_item.sum|floatformat:2|intcomma }} руб.</span>
-								{% else %}
-									<span>0,00 руб.</span>
-								{% endif %}
-								<a name="remove-from-cart" href="{% url 'cart:remove' product_id=product.id %}">
-                                    <i class="organik-icon-close remove-icon"></i>
-                                </a>
-							</p>
-						{% endwith %}
-					{% endfor %}
-					{% if delivery_price and basket %}
-						<p>
-							<span>Доставка</span>
-							<span>{{ delivery_price|floatformat:2|intcomma }} руб.</span>
-							<a name="remove-from-cart" href="{% url 'cart:remove' product_id=product.id %}">
-								<i class="organik-icon-close remove-icon"></i>
-							</a>
-						</p>
-					{% endif %}
-				</div> -->
 			</div>
 			<div class="col-md-6">
 				{% if ready_for_payment %}
