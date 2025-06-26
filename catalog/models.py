@@ -17,6 +17,9 @@ class Category(models.Model):
         blank=True,
         db_index=True
     )
+    order = models.PositiveIntegerField(
+        'Порядок сортировки', default=1, validators=[MinValueValidator(0)]
+    )
 
     class Meta:
         verbose_name = 'Категория'

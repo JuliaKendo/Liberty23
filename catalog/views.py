@@ -45,7 +45,13 @@ class FiltersView(LoginRequiredMixin, TemplateView):
     
     def get_filters(self, qs):
         filters = dict()
-        filters['category'] = self.get_filter(qs, 'count', 'category__name', ident='category__id')
+        filters['category'] = self.get_filter(
+            qs.exclude(category__order=0), 
+            'count', 
+            'category__name', 
+            ident='category__id', 
+            root_order=['category__order']
+        )
         # filters['price-range'] = self.get_filter()
         return filters
 
@@ -96,18 +102,21 @@ class ProductsView(FiltersView, ListView):
 
     def get_queryset(self):
         current_department = СurrentDepartment(self.request)
-        products = Product.objects.all()
+        products = Product.objects.filter(category__order__gt=0).order_by('category__order')
         if current_department:
-            products = Product.objects.filter(departments__id=current_department.department.id)    
+            products = Product.objects.filter(
+                departments__id=current_department.department.id, 
+                category__order__gt=0
+            )    
         if self.filters:
             filtred_products = ProductFilter(self.filters, queryset=products)
             products = filtred_products.qs
         
         if 'name' in self.sort_by.keys():
-            products = products.order_by('name')
+            products = products.order_by('category__order', 'name')
             if self.sort_by['name'] == 'sort_descending':
-                products = products.order_by('-name') 
-   
+                products = products.order_by('category__order', '-name') 
+
         return products
 
     def get_context_data(self, *, object_list=None, **kwargs):
