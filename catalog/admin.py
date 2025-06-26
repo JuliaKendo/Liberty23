@@ -57,10 +57,12 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = [
         'parent_category',
         'name',
+        'order',
     ]
     fields = [
         'parent_category',
         'name',
+        'order',
     ]
     list_filter = [
         'name',
