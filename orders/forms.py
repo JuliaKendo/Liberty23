@@ -10,8 +10,10 @@ class DeliveryAddressesForm(forms.ModelForm):
         fields = [
             'fname',
             'lname',
+            'patronymic',
             'date_of_birth',
             'email',
+            'phone',
         ]
 
     def __init__(self, *args, **kwargs):

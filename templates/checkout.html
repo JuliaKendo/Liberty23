@@ -100,19 +100,31 @@
 							</select>
 						</div>
 						<span class="col-md-12 text-danger text-error" name="username" style="display: none;"></span>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							{% if read_only %}
 								<input type="text" name="fname" placeholder="Имя" value="{{ delivery_address.fname|default:'' }}" disabled>
 							{% else %}
 								<input type="text" name="fname" placeholder="Имя" value="{{ delivery_address.fname|default:'' }}">
 							{% endif %}
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							{% if read_only %}
 								<input type="text" name="lname" placeholder="Фамилия" value="{{ delivery_address.lname|default:'' }}" disabled>
 							{% else %}
 								<input type="text" name="lname" placeholder="Фамилия" value="{{ delivery_address.lname|default:'' }}">
 							{% endif %}
+						</div>
+						<div class="col-md-4">
+							{% if read_only %}
+								<input type="text" name="patronymic" placeholder="Отчество" value="{{ delivery_address.patronymic|default:'' }}" disabled>
+							{% else %}
+								<input type="text" name="patronymic" placeholder="Отчетсво" value="{{ delivery_address.patronymic|default:'' }}">
+							{% endif %}
+						</div>
+						<div class="col-md-12">
+							<span class="checkout-error text-danger text-error" name="fname" style="display: none;"></span>
+							<span class="checkout-error text-danger text-error" name="lname" style="display: none;"></span>
+							<span class="checkout-error text-danger text-error" name="patronymic" style="display: none;"></span>
 						</div>
 						<div class="col-md-12">
 							{% if read_only %}
@@ -121,16 +133,27 @@
 								<input type="date" name="date_of_birth" placeholder="Дата пождения (ДД.ММ.ГГГГ)" value="{{ delivery_address.date_of_birth|default_if_none:'0001-01-01'|date:'Y-m-d' }}" >
 							{% endif %}
 						</div>
-						<div class="col-md-12">
+						<div class="col-md-6">
 							{% if read_only %}
 								<input type="email" name="email" placeholder="email" value="{{ delivery_address.email|default:'' }}" disabled>
 							{% else %}
 								<input type="email" name="email" placeholder="email" value="{{ delivery_address.email|default:'' }}">
 							{% endif %}
 						</div>
+						<div class="col-md-6">
+							{% if read_only %}
+								<input type="text" placeholder="Телефон" name="phone" value="{{ delivery_address.phone|default:'' }}" disabled>
+							{% else %}
+								<input type="text" placeholder="Телефон" name="phone" value="{{ delivery_address.phone|default:'' }}">
+							{% endif %}
+						</div>
+						<div class="col-md-12">
+							<span class="checkout-error text-danger text-error" name="email" style="display: none;"></span>
+							<span class="checkout-error text-danger text-error" name="phone" style="display: none;"></span>
+						</div>
 						<div class="col-md-12">
 							{% if read_only %}
-								<textarea name="notes" placeholder="Дополнительная информация о заказе" disabled></textarea>
+								<textarea name="notes" placeholder="Дополнительная информация о заказе" disabled> {{ order.additional_info }} </textarea>
 							{% else %}
 								<textarea name="notes" placeholder="Дополнительная информация о заказе"></textarea>
 							{% endif %}

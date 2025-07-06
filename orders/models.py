@@ -19,6 +19,7 @@ class DeliveryAddresses(models.Model):
     country    = models.CharField('Страна доставки', max_length=50, blank=True)
     fname      = models.CharField('Имя', max_length=50, blank=True)
     lname      = models.CharField('Фамилия', max_length=100, blank=True)
+    patronymic = models.CharField('Отчество', max_length=100, blank=True)
     company    = models.CharField('Компания', max_length=100, blank=True)
     address    = models.CharField('Адрес', max_length=200, blank=True)
     town       = models.CharField('Город', max_length=50, blank=True)

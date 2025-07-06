@@ -78,6 +78,7 @@ class DeliveryAddressesAdmin(admin.ModelAdmin):
         'customer',
         'fname',
         'lname',
+        'patronymic',
         'date_of_birth',
         'email',
     ]
@@ -87,6 +88,7 @@ class DeliveryAddressesAdmin(admin.ModelAdmin):
         ('customer', 'created_at',),
         'fname',
         'lname',
+        'patronymic',
         'date_of_birth',
         'company',
         'address',

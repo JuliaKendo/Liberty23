@@ -288,6 +288,7 @@ def order_add(request):
                                 'country',
                                 'fname',
                                 'lname',
+                                'patronymic',
                                 'company',
                                 'address',
                                 'town',
