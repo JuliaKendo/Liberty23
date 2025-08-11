@@ -85,9 +85,8 @@ class Cart(object):
             else:
                 quantity_in_cart = quantity
             weight_products = sum(
-                float(item['product']['weight']) * \
-                    quantity_in_cart if item['product']['id'] == product.id else item['quantity'] \
-                    for item in self.cart.values()
+                float(item['product']['weight']) * item['quantity'] for item in self.cart.values() if item['product']['id'] != product.id) \
+                    + (quantity_in_cart * float(product.weight)
             )
         else:
             quantity_in_cart = quantity
