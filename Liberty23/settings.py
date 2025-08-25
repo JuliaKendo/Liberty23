@@ -99,6 +99,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'enterprise.context_processors.contact',
                 'enterprise.context_processors.department',
+                'enterprise.context_processors.managers_phone',
                 'cart.context_processors.cart',
             ],
             'libraries': {

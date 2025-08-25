@@ -29,11 +29,18 @@
                 </div>
             </div>
 
-            <div class="topbar__right">
+            <div class="topbar__right">  
                 <div class="topbar__info">
                     <i class="organik-icon-calling"></i>
-                    <p>Телефон <a href="tel:{{contact.phone}}">{{ contact.phone }}</a></p>
+                    {% for phone in phones %}
+                        {% if forloop.first %}
+                            <p>Телефон <a style="font-size: calc(17px - {{ phones|length }}px)" href="tel:{{phone}}">{{ phone }}</a></p>
+                        {% else %}
+                            <p><a style="font-size: calc(17px - {{ phones|length }}px)" href="tel:{{phone}}">{{ phone }}</a></p>
+                        {% endif %}
+                    {% endfor %}
                 </div>
+                
                 <div class="topbar__buttons">
                     <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
                     <!-- <a href="javascript:void(0);" class="mini-cart__toggler"> -->

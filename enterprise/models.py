@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 
@@ -63,6 +64,24 @@ class Contacts(SingletonModel):
     def __str__(self):
         return self.name
 
+
+class Manager(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        related_name='managers'
+    )
+    phone = PhoneNumberField('Телефон', db_index=True)
+    email = models.EmailField('email', db_index=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Менеджер'
+        verbose_name_plural = 'Менеджеры'
+    
+    def __str__(self):
+        return self.user.username
+    
 
 class News(models.Model):
 

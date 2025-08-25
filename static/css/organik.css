@@ -3475,6 +3475,9 @@ h6 {
   .footer-widget__contact li {
     margin-bottom: 15px;
   }
+  .footer-widget__contact .footer-widget__phone {
+    margin-bottom: 0;
+  }
 }
 
 @media (min-width: 1200px) {

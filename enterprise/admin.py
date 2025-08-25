@@ -10,7 +10,8 @@ from .models import (
     Department,
     PaymentSetup,
     EnterpriseSetting,
-    IntegrationSettings
+    IntegrationSettings,
+    Manager,
 )
 from .forms import CustomIntegrationForm, PasswordInputForm
 from prices.models import DeliveryPrice
@@ -47,6 +48,25 @@ class ContactsAdmin(admin.ModelAdmin):
         ('email', 'additional_email',),
         'address',
         ('insta', 'ok', 'fb', 'vk',),
+    ]
+    list_display_links = list_display
+
+
+@admin.register(Manager)
+class ManagerAdmin(admin.ModelAdmin):
+    search_fields = [
+        'user',
+        'phone',
+        'email',
+    ]
+    list_display = [
+        'user',
+        'phone',
+        'email',
+    ]
+    fields = [
+        'user',
+        ('phone', 'email'),
     ]
     list_display_links = list_display
 

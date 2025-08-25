@@ -19,10 +19,14 @@
                 <div class="footer-widget footer-widget__contact-widget">
                     <h3 class="footer-widget__title">Контакты</h3>
                     <ul class="list-unstyled footer-widget__contact">
-                        <li>
-                            <i class="fa fa-phone-square"></i>
-                            <a href="tel:{{contact.phone}}">{{ contact.phone }}</a>
+                        {% for phone in phones %}
+                        <li class="footer-widget__phone" style="{{ forloop.last|yesno:'margin-bottom: 15px;, ' }}">
+                            {% if forloop.first %}
+                                <i class="fa fa-phone-square"></i>
+                            {% endif %}
+                            <a href="tel:{{phone}}">{{ phone }}</a>
                         </li>
+                        {% endfor %}
                         <li>
                             <i class="fa fa-envelope"></i>
                             <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
