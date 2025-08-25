@@ -36,17 +36,6 @@ class OutgoingMailSentFilter(admin.SimpleListFilter):
             return queryset.filter(sent_date__isnull=True)
 
 
-@admin.register(NotifyTemplate)
-class NotifyTemplateAdmin(SummernoteModelAdmin):
-    search_fields = ['name', ]
-    list_display = ['name', ]
-    summernote_fields = ('header_template', 'footer_template',)
-    fields = ['name', 'header_template', 'footer_template',]
-
-    def has_module_permission(self, request):
-        return False
-
-
 @admin.register(OutgoingMail)
 class OutgoingMailAdmin(SummernoteModelAdmin):
     search_fields = ['email', 'subject']
@@ -58,10 +47,22 @@ class OutgoingMailAdmin(SummernoteModelAdmin):
     fields = ['email', 'subject', 'html_content',]
 
     actions = ['put_in_mail_queue']
+
     @admin.action(description='Поместить в очередь отправки')
     def put_in_mail_queue(self, request, queryset):
         for obj in queryset:
             send_outgoing_mail({'id': obj.id})
+
+
+@admin.register(NotifyTemplate)
+class NotifyTemplateAdmin(SummernoteModelAdmin):
+    search_fields = ['name', ]
+    list_display = ['name', ]
+    summernote_fields = ('header_template', 'footer_template',)
+    fields = ['name', 'header_template', 'footer_template',]
+
+    def has_module_permission(self, request):
+        return False
 
 
 @admin.register(MailingOfLetters)
@@ -77,6 +78,7 @@ class MailingOfLettersAdmin(SummernoteModelAdmin):
     inlines = [EmailsInLine,]
 
     actions = ['set_sent_status']
+
     @admin.action(description='Установить статус к отправке')
     def set_sent_status(self, request, queryset):
         for obj in queryset:

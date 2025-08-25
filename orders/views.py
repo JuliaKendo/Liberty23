@@ -24,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import DeliveryAddresses, Order, OrderItem
 from .forms import OrderForm, OrderItemForm, DeliveryAddressesForm
-from .tasks import planed_update_of_stoks
+from .tasks import planed_update_of_stoks, send_by_email
 from cart.cart import Cart
 from cart.models import Basket
 from catalog.models import Product
@@ -33,10 +33,6 @@ from Liberty23.forms import SignUpForm
 from prices.lib import get_delivery_price
 from enterprise.models import Department
 from enterprise.departments import СurrentDepartment
-
-
-class CartIsEmpty(Exception):
-    pass
 
 
 class PriceTypeSerializer(ModelSerializer):
@@ -165,41 +161,49 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
 
 
 class PreOrderView(CheckoutView):
+    def _sync_cart_to_basket(self, user, cart):
+        """
+        Переносит содержимое корзины (Cart) в Basket пользователя.
+        Если товар уже есть в Basket — обновляет количество и сумму.
+        Если нет — добавляет новые записи (bulk_create для оптимизации).
+        """
+        new_items = []
+
+        for item in cart:
+            product = get_object_or_404(Product, pk=item['product']['id'])
+            basket_item = Basket.objects.filter(
+                user=user, product=product, unit=product.unit
+            ).first()
+
+            if basket_item:
+                basket_item.quantity += item['quantity']
+                basket_item.price = item['price']
+                basket_item.sum = float(basket_item.sum) + item['total_price']
+                basket_item.save(update_fields=["quantity", "price", "sum"])
+            else:
+                new_items.append(
+                    Basket(
+                        user=user, product=product,
+                        unit=product.unit, quantity=item['quantity'],
+                        price=item['price'], sum=item['total_price']
+                    )
+                )
+
+        if new_items:
+            Basket.objects.bulk_create(new_items)
 
     def dispatch(self, request, *args, **kwargs):
-        basket = []
         user = request.user
         cart = Cart(request)
         try:
             with transaction.atomic():
-                for item in cart:
-                    product = get_object_or_404(Product, pk=item['product']['id'])
-                    product_ordered = Basket.objects.filter(user=user, product=product, unit=product.unit)
-                    if not product_ordered.exists():
-                        basket.append(
-                            Basket(
-                                user=user,
-                                product=product,
-                                unit=product.unit,
-                                quantity=item['quantity'],
-                                price=item['price'],
-                                sum=item['total_price'])
-                        )
-                    else:
-                        product_ordered.update(
-                            quantity=product_ordered.first().quantity + item['quantity'],
-                            price=item['price'],
-                            sum=float(product_ordered.first().sum) + item['total_price']
-                        )
-            if basket:
-                Basket.objects.bulk_create(basket)
+                self._sync_cart_to_basket(user, cart)
+
         except Exception:
-            transaction.rollback()
+            # Если ошибка — транзакция автоматически откатится
+            return super().dispatch(request, *args, **kwargs)
         else:
             cart.clear()
-        finally:
-            if transaction.get_autocommit():
-                transaction.commit()
 
         return super().dispatch(request, *args, **kwargs)
     
@@ -261,86 +265,41 @@ def remove_from_basket(request, product_id):
 
 @require_POST
 @planed_update_of_stoks()
+@send_by_email()
 def order_add(request):
     user = request.user
     cart = Basket.objects.filter(user=user)
-    departments = СurrentDepartment(request)
+    if not len(cart): 
+        JsonResponse({'cartIsEmpty': ['В корзине отсутствуют товары для заказа']}, status=400)
+    
     create_account = request.POST.get('createAccount', '') == 'on' \
         and not request.user.is_authenticated
+
     delivery_addresses_form = DeliveryAddressesForm(request.POST)
-    delivery_addresses_instance = DeliveryAddresses.objects.none()
+    if not delivery_addresses_form.is_valid():
+        return JsonResponse(delivery_addresses_form.errors, status=400)
 
-    try:
-        if not len(cart):
-            raise CartIsEmpty; 
+    try:  
         with transaction.atomic(): 
-            if delivery_addresses_form.is_valid():
-                if create_account:
-                    user = create_user_and_login(request, delivery_addresses_form.cleaned_data)
+            # Получаем или создаем адрес доставки
+            if create_account:
+                user = create_user_and_login(request, delivery_addresses_form.cleaned_data)
+            delivery_address = _get_or_update_delivery_address(user, delivery_addresses_form)
 
-                try:
-                    delivery_addresses_instance = DeliveryAddresses.objects.get(customer=user)
-                    delivery_addresses_instance.__dict__.update(
-                        **{
-                            key: value for \
-                            key, value in \
-                            delivery_addresses_form.cleaned_data.items() if key in [
-                                'country',
-                                'fname',
-                                'lname',
-                                'patronymic',
-                                'company',
-                                'address',
-                                'town',
-                                'state',
-                                'zip',
-                                'email',
-                                'phone',
-                                'date_of_birth'
-                    ]})
-                except DeliveryAddresses.DoesNotExist:
-                    delivery_addresses_instance = delivery_addresses_form.save(commit=False)
-                    delivery_addresses_instance.customer = user
-                delivery_addresses_instance.save()
-                order_form = OrderForm({
-                    'customer': user,
-                    'status': request.POST.get('status', 'introductory'),
-                    'delivery_address': delivery_addresses_instance,
-                    'additional_info': request.POST.get('additional_info', ''),
-                    'department': departments.department
-                })
-                if order_form.is_valid():
-                    errors = []
-                    order_instance = order_form.save(commit=False)
-                    order_instance.save()
-                    for item in cart:
-                        item_form = OrderItemForm({
-                            'product': item.product,
-                            'unit': item.unit,
-                            'quantity': item.quantity,
-                            'price': item.price,
-                            'sum': item.sum
-                        })
-                        if item_form.is_valid():
-                            item_instance = item_form.save(commit=False)
-                            item_instance.order = order_instance
-                            item_instance.save()
-                        else:
-                            errors.append(order_form.errors)
-                            continue
-                    if errors:
-                        raise ValidationError(errors)
-                else:
-                    raise ValidationError(order_form.errors)
-            else:
-                raise ValidationError(delivery_addresses_form.errors)
+            # Создаем заказ
+            order = _create_order(request, user, delivery_address)
+
+            # Добавляем позиции заказа
+            _create_order_items(order, cart)
+
+            # Очищаем корзину
+            cart.delete()
+
 
     except ValidationError as errors:
-        transaction.rollback()
         return JsonResponse(errors.message_dict, safe=False)
     
     except ValueError as errors:
-        transaction.rollback()
         return JsonResponse(
             {
                 'createAccount': ['Для оформелния заказа необходимо войти или зарегистрироваться.']
@@ -348,21 +307,65 @@ def order_add(request):
             safe=False
         )
 
-    except CartIsEmpty as errors:
-        transaction.rollback()
-        return JsonResponse(
-            {'cartIsEmpty': ['В корзине отсутствуют товары для заказа']},
-            safe=False
-        )
+    return JsonResponse({'InvId': order.id}, status=200)
 
-    else:
-        cart.delete()
 
-    finally:
-        if transaction.get_autocommit():
-            transaction.commit()
+def _get_or_update_delivery_address(user, delivery_form):
+    """Получает или обновляет адрес доставки для пользователя."""
+    try:
+        delivery_address = DeliveryAddresses.objects.get(customer=user)
+        delivery_address.__dict__.update(
+            **{
+                key: value for \
+                key, value in \
+                delivery_form.cleaned_data.items() if key in [
+                    'country', 'fname', 'lname', 'patronymic',
+                    'company', 'address', 'town', 'state', 'zip',
+                    'email', 'phone', 'date_of_birth'
+        ]})
+    except DeliveryAddresses.DoesNotExist:
+        delivery_address = delivery_form.save(commit=False)
+        delivery_address.customer = user
+    delivery_address.save()
+    return delivery_address
 
-    return JsonResponse({'InvId': order_instance.id}, status=200)
+
+def _create_order(request, user, delivery_address):
+    """Создает заказ для пользователя."""
+    order_form = OrderForm({
+        'customer': user,
+        'status': request.POST.get('status', 'introductory'),
+        'delivery_address': delivery_address,
+        'additional_info': request.POST.get('additional_info', ''),
+        'department': СurrentDepartment(request).department
+    })
+
+    if not order_form.is_valid():
+        raise ValidationError(order_form.errors)
+
+    return order_form.save()
+
+
+def _create_order_items(order, cart):
+    """Создает позиции заказа на основе корзины."""
+    errors = []
+    for item in cart:
+        item_form = OrderItemForm({
+            'product': item.product,
+            'unit': item.unit,
+            'quantity': item.quantity,
+            'price': item.price,
+            'sum': item.sum,
+        })
+        if item_form.is_valid():
+            order_item = item_form.save(commit=False)
+            order_item.order = order
+            order_item.save()
+        else:
+            errors.append(item_form.errors)
+
+    if errors:
+        raise ValidationError(errors)
 
 
 @require_GET

@@ -26,6 +26,8 @@ from .models import (
 MAX_NUM_OF_EMAIL_ADDRESSES_SENT = 1
 DEFAULT_TIMEOUT_FOR_SENDING_EMAILS = 1
 
+# SEND EMAIL:
+
 def launch_mailing():
     def wrap(func):
         @wraps(func)
@@ -55,6 +57,32 @@ def launch_mailing():
         return run_func
     return wrap
 
+
+@job('default')
+def send_email(html_content, recipient_list, **params):
+    for recipient in recipient_list:
+        email = EmailMessage(
+            params['subject'],
+            html_content,
+            f'Свобода 23 <{settings.EMAIL_HOST_USER}>',
+            [recipient],
+            # reply_to=['TALANT<opt@talantgold.ru>'],
+        )
+        email.content_subtype = "html"
+        email.send()
+
+    if params.get('obj_id'):
+        OutgoingMail.objects.filter(id=params['obj_id']).update(
+            sent_date=datetime.datetime.now()
+        )
+
+    if params.get('mailing_of_letter'):
+        mailing_of_letter = params.get('mailing_of_letter')
+        mailing_of_letter.status = MailingOfLetters.COMPLETED
+        mailing_of_letter.save(update_fields=['status'])
+
+
+# PREPARE EMAIL:
 
 def get_email_addresses(emails):
     email_addresses = emails.values_list('email', flat=True)
@@ -132,41 +160,16 @@ def get_mail_params(notification_options):
 
 @launch_mailing()
 def create_outgoing_mail(mail_params):
-    letter_content = mail_params['content']
-    template = Template(letter_content)
-    rendered_html = template.render(Context(mail_params['context']))
-    html_content = render_to_string('forms/notify-template.html', {'params': rendered_html})
-    if mail_params.get('template'):
-        letter_template = mail_params.get('template')
-        html_content = html_content.replace('<header></header>', letter_template.header_template)
-        html_content = html_content.replace('<footer></footer>', letter_template.footer_template)
+    if mail_params['content']:
+        letter_content = mail_params['content']
+        template = Template(letter_content)
+        rendered_html = template.render(Context(mail_params['context']))
+        html_content = render_to_string('forms/notify-template.html', {'params': rendered_html})
+    else:
+        html_content = render_to_string(mail_params['template'], mail_params['context'])
     return OutgoingMail.objects.create(
         email=';'.join(mail_params['recipient_list']),
         subject=mail_params['subject'],
         html_content=html_content
     )
-
-
-@job('default')
-def send_email(html_content, recipient_list, **params):
-    for recipient in recipient_list:
-        email = EmailMessage(
-            params['subject'],
-            html_content,
-            f'Свобода 23 <{settings.EMAIL_HOST_USER}>',
-            [recipient],
-            # reply_to=['TALANT<opt@talantgold.ru>'],
-        )
-        email.content_subtype = "html"
-        email.send()
-
-    if params.get('obj_id'):
-        OutgoingMail.objects.filter(id=params['obj_id']).update(
-            sent_date=datetime.datetime.now()
-        )
-
-    if params.get('mailing_of_letter'):
-        mailing_of_letter = params.get('mailing_of_letter')
-        mailing_of_letter.status = MailingOfLetters.COMPLETED
-        mailing_of_letter.save(update_fields=['status'])
 

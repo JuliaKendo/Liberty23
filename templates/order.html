@@ -1,0 +1,107 @@
+{% load humanize %}
+
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+
+  <h3 style="font-size: 18px; font-weight: bold; margin: 20px 0; text-align: center;">
+    ВАШ ЗАКАЗ № {{ order.id }}
+  </h3>
+
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid #dee2e6; padding: 8px; text-align: left; background-color: #f8f9fa;">Товар</th>
+        <th style="border: 1px solid #dee2e6; padding: 8px; text-align: right; background-color: #f8f9fa;">Стоимость</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cart_item in basket %}
+        {% with product=cart_item.product %}
+          <tr>
+            <td style="border: 1px solid #dee2e6; padding: 8px;">{{ product.name }}</td>
+            <td style="border: 1px solid #dee2e6; padding: 8px; text-align: right;">
+              {% if cart_item.sum %}
+                {{ cart_item.sum|floatformat:2|intcomma }} руб.
+              {% else %}
+                0,00 руб.
+              {% endif %}
+            </td>
+          </tr>
+        {% endwith %}
+      {% endfor %}
+      {% if delivery_price and basket %}
+        <tr>
+          <td style="border: 1px solid #dee2e6; padding: 8px;">Доставка</td>
+          <td style="border: 1px solid #dee2e6; padding: 8px; text-align: right;">
+            {{ delivery_price|floatformat:2|intcomma }} руб.
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+    <!-- Итоги заказа -->
+  <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #dee2e6; background-color: #f9f9f9;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr>
+        <td style="padding: 6px; font-weight: bold;">Вес</td>
+        <td style="padding: 6px; text-align: right;">{{ order.get_total_weight|floatformat:3|intcomma }} кг.</td>
+      </tr>
+      <tr>
+        <td style="padding: 6px; font-weight: bold;">Всего</td>
+        <td style="padding: 6px; text-align: right;">{{ order.get_total_cost }} руб.</td>
+      </tr>
+      <tr>
+        <td style="padding: 6px; font-weight: bold;">Итого с доставкой</td>
+        <td style="padding: 6px; text-align: right;">
+          {% with sum=order.get_total_cost|add:delivery_price %}
+            {{ sum|floatformat:2|intcomma }} руб.
+          {% endwith %}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Статус заказа -->
+  <div style="border: 1px solid #dee2e6; padding: 12px; margin-bottom: 20px; background: #f9f9f9;">
+    <p style="margin: 0; font-weight: bold;">Статус заказа:</p>
+    <p style="margin: 5px 0 0 0; font-size: 16px; color: #28a745;">
+      {{ order.get_status_display }}
+    </p>
+  </div>
+
+  <!-- Детали заказа -->
+  <h3 style="font-size: 16px; font-weight: bold; margin: 20px 0 10px;">Детали заказа</h3>
+  {% with delivery_address=delivery_addresses|first %}
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 6px; font-weight: bold; width: 30%;">Имя:</td>
+      <td style="padding: 6px;">{{ delivery_address.fname|default:'' }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px; font-weight: bold;">Фамилия:</td>
+      <td style="padding: 6px;">{{ delivery_address.lname|default:'' }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px; font-weight: bold;">Отчество:</td>
+      <td style="padding: 6px;">{{ delivery_address.patronymic|default:'' }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px; font-weight: bold;">Дата рождения:</td>
+      <td style="padding: 6px;">{{ delivery_address.date_of_birth|default_if_none:"—" }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px; font-weight: bold;">Email:</td>
+      <td style="padding: 6px;">{{ delivery_address.email|default:'' }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px; font-weight: bold;">Телефон:</td>
+      <td style="padding: 6px;">{{ delivery_address.phone|default:'' }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px; font-weight: bold; vertical-align: top;">Доп. информация:</td>
+      <td style="padding: 6px;">{{ order.additional_info|default:"—" }}</td>
+    </tr>
+  </table>
+  {% endwith %}
+
+</div>

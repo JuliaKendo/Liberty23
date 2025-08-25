@@ -6,8 +6,12 @@ from django_rq import get_queue
 from functools import wraps
 from rq import Retry, get_current_job
 from redis.exceptions import ConnectionError
+from django.shortcuts import get_object_or_404
 
-from enterprise.models import IntegrationSettings
+from enterprise.models import IntegrationSettings, Contacts
+from mailings.tasks import create_outgoing_mail
+from orders.models import Order, OrderItem, DeliveryAddresses
+from prices.lib import get_delivery_price
 
 queue = get_queue('default')
 
@@ -56,3 +60,42 @@ def launch_update_of_stoks(order_id):
         except Exception as error:
             print(f"Ошибка выполнения запроса {url}: {error} ({response.text})")
             raise error  # повтор будет автоматически инициирован
+
+
+def send_by_email():
+    def wrap(func):
+        @wraps(func)
+        def run_func(request):
+            response = func(request)
+            if response.status_code == 200:
+                order_id = json.loads(response.content.decode()).get('InvId')
+                if order_id:
+                    launch_send_by_email(request, order_id)
+            return response
+        return run_func
+    return wrap
+
+
+def launch_send_by_email(request, order_id):
+    context = {
+        'ready_for_payment': False,
+        'order': get_object_or_404(Order, pk=order_id),
+        'basket': OrderItem.objects.filter(order__pk=order_id),
+        'delivery_addresses': DeliveryAddresses.objects.filter(customer=request.user).order_by('-created_at'),
+        'delivery_price': get_delivery_price(request),
+        'read_only': True,
+    }
+    recipient_list = [request.user.email]
+    contacts = Contacts.objects.first()
+    if contacts and contacts.email: 
+        recipient_list.append(contacts.email)
+    if contacts and contacts.additional_email: 
+        recipient_list.append(contacts.additional_email)
+    create_outgoing_mail({
+        'recipient_list'   : recipient_list,
+        'subject'          : f'Заказ №{order_id}',
+        'template'         : 'order.html',
+        'content'          : '',
+        'context'          : context,
+        'order_id'         : order_id,
+    })
