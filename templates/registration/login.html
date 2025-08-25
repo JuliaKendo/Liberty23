@@ -1,3 +1,38 @@
+{% load static %}
+<style>
+    .pass-contaner {
+        position: relative;
+    }
+    .show-password-btn-wrapper {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+    .show-password-btn-wrapper__eye-icon {
+        height: 48px;
+        width: 48px;
+        background-repeat: no-repeat;
+    }
+    .show-password-btn-wrapper__btn {
+        border: 0;
+        background: transparent;
+    }
+    .show-password-btn-wrapper__btn:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .eye-icon__hidden {
+        display: none;
+    }
+    .eye-icon__crossed {
+        display: block;
+    }
+    input[type="password"] {
+        width: 100%;
+        padding-right: 59px!important; /* Оставляем место для кнопки */
+    }
+</style>
 
 <div class="login__overlay login__toggler"></div>
 <div class="login__content">
@@ -17,12 +52,24 @@
         </div>
         <div>
             {{ form.password.label_tag }}
-            {{ form.password }}
+            <div class="pass-contaner">
+                {{ form.password }}
+                <button type="button" id="eye-view-btn" class="show-password-btn-wrapper show-password-btn-wrapper__btn">
+                    <div
+                        class="show-password-btn-wrapper__eye-icon eye-icon__hidden"
+                        style="background-image: url('{% static "/images/shapes/eye.svg" %}')"
+                    ></div>
+                    <div
+                        class="show-password-btn-wrapper__eye-icon eye-icon__crossed"
+                        style="background-image: url('{% static "/images/shapes/eye-crossed.svg" %}')"
+                    ></div>
+                </button>
+            </div>
             {% if form.password.errors %}
                 <div class="error">{{ form.password.errors }}</div>
             {% endif %}
         </div>
-        <button type="submit" class="thm-btn" style="margin-top: 100px;">Войти</button>
+        <button type="submit" id="signup-btn" class="thm-btn" style="margin-top: 100px;">Войти</button>
     </form>
 
 </div><!-- /.login__content -->

@@ -1,3 +1,4 @@
+{% load static %}
 <style>
     .custom__checkbox {
         width: 15px;
@@ -15,6 +16,38 @@
         margin-top: 2px;
         background-size: contain;
         background-image: url("data:image/svg+xml;charset=UTF-8,%3c?xml version='1.0' encoding='iso-8859-1'?%3e%3c!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --%3e%3csvg fill='%23000000' height='800px' width='800px' version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 128.411 128.411' xml:space='preserve'%3e%3cg%3e%3cg%3e%3cpolygon points='127.526,15.294 45.665,78.216 0.863,42.861 0,59.255 44.479,113.117 128.411,31.666 '/%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3cg%3e%3c/g%3e%3c/g%3e%3c/svg%3e");
+    }
+    .pass-contaner {
+        position: relative;
+    }
+    .show-password-btn-wrapper {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+    .show-password-btn-wrapper__eye-icon {
+        height: 48px;
+        width: 48px;
+        background-repeat: no-repeat;
+    }
+    .show-password-btn-wrapper__btn {
+        border: 0;
+        background: transparent;
+    }
+    .show-password-btn-wrapper__btn:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .eye-icon__hidden {
+        display: none;
+    }
+    .eye-icon__crossed {
+        display: block;
+    }
+    input[type="password"]{
+        width: 100%;
+        padding-right: 59px!important; /* Оставляем место для кнопки */
     }
 </style>
 <div class="login__overlay login__toggler"></div>
@@ -42,19 +75,43 @@
         </div>
         <div>
             {{ form.password1.label_tag }}
-            {{ form.password1 }}
+            <div class="pass-contaner">
+                {{ form.password1 }}
+                <button type="button" id="eye-view-btn" class="show-password-btn-wrapper show-password-btn-wrapper__btn">
+                    <div
+                        class="show-password-btn-wrapper__eye-icon eye-icon__hidden"
+                        style="background-image: url('{% static "/images/shapes/eye.svg" %}')"
+                    ></div>
+                    <div
+                        class="show-password-btn-wrapper__eye-icon eye-icon__crossed"
+                        style="background-image: url('{% static "/images/shapes/eye-crossed.svg" %}')"
+                    ></div>
+                </button>
+            </div>
             {% if form.password1.errors %}
                 <div class="error">{{ form.password1.errors }}</div>
             {% endif %}
         </div>
         <div>
             {{ form.password2.label_tag }}
-            {{ form.password2 }}
+            <div class="pass-contaner">
+                {{ form.password2 }}
+                <button type="button" id="eye-view-btn" class="show-password-btn-wrapper show-password-btn-wrapper__btn">
+                    <div
+                        class="show-password-btn-wrapper__eye-icon eye-icon__hidden"
+                        style="background-image: url('{% static "/images/shapes/eye.svg" %}')"
+                    ></div>
+                    <div
+                        class="show-password-btn-wrapper__eye-icon eye-icon__crossed"
+                        style="background-image: url('{% static "/images/shapes/eye-crossed.svg" %}')"
+                    ></div>
+                </button>
+            </div>
             {% if form.password2.errors %}
                 <div class="error">{{ form.password2.errors }}</div>
             {% endif %}
         </div>
-        <button type="submit" class="thm-btn" style="margin-top: 30px;">Зарегистрироваться</button>
+        <button type="submit" id="signup-btn" class="thm-btn" style="margin-top: 30px;">Зарегистрироваться</button>
         <div class="login__terms">
             {{ form.agree_to_terms }}
             <div class="custom__checkbox" name="custom__checkbox" onclick="toggleCheckbox(this);">

@@ -651,7 +651,25 @@
     });
   }
   function eventLoginForm() {
-    $('#signup-form button').click(e => {
+    $('#signup-form #eye-view-btn').click(e => {
+      e.preventDefault();
+      console.log(e.currentTarget);
+      const hiddenEyeIcon = $(e.currentTarget).children('.eye-icon__hidden');
+      const crossedEyeIcon = $(e.currentTarget).children('.eye-icon__crossed');
+
+      hiddenEyeIcon.removeClass('eye-icon__hidden').addClass('eye-icon__crossed');
+      crossedEyeIcon.removeClass('eye-icon__crossed').addClass('eye-icon__hidden');
+
+      let passwordInput = $(e.currentTarget).parent('.pass-contaner').find('#id_password');
+      if (!passwordInput.length)
+        passwordInput = $(e.currentTarget).parent('.pass-contaner').find('#id_password1');
+      if (!passwordInput.length)
+        passwordInput = $(e.currentTarget).parent('.pass-contaner').find('#id_password2');
+      const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+      passwordInput.attr('type', type);
+
+    });
+    $('#signup-form #signup-btn').click(e => { 
       e.preventDefault();
       const loginForm = $(".login-form");
       const form = $('#signup-form');
@@ -675,7 +693,7 @@
           }
         },
         error: (errors => handleException(errors))
-      });
+      });  
     });
     // Закрываем форму по клику на крестик:
     $(".login-form i.organik-icon-close").click(e => {

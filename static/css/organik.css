@@ -8217,8 +8217,8 @@ h6 {
   display: block;
   font-size: 16px;
   padding: 0;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding-left: 15px;
+  padding-right: 15px;
   color: var(--thm-color);
   margin-bottom: 10px;
   border-radius: 0;
