@@ -30,13 +30,13 @@ def planed_update_of_stoks():
         def run_func(request):
             response = func(request)
             order_id = json.loads(response.content.decode()).get('InvId')
-            if order_id:
-                with suppress(ConnectionError):
-                    queue.enqueue(
-                        launch_update_of_stoks,
-                        args=[order_id],
-                        retry=Retry(max=10, interval=[1, 3, 5, 10, 30, 60, 60*5, 60*10, 60*30, 60*60]),
-                    )
+            if not order_id: return response
+            with suppress(ConnectionError):
+                queue.enqueue(
+                    launch_update_of_stoks,
+                    args=[order_id],
+                    retry=Retry(max=10, interval=[1, 3, 5, 10, 30, 60, 60*5, 60*10, 60*30, 60*60]),
+                )
             return response
         return run_func
     return wrap
@@ -69,7 +69,8 @@ def send_by_email():
             response = func(request)
             if response.status_code == 200:
                 order_id = json.loads(response.content.decode()).get('InvId')
-                if order_id:
+                if not order_id: return response
+                with suppress(ConnectionError):
                     launch_send_by_email(request, order_id)
             return response
         return run_func
