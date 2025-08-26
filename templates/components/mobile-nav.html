@@ -19,10 +19,18 @@
                 <i class="organik-icon-email"></i>
                 <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
             </li>
-            <li>
-                <i class="organik-icon-calling"></i>
-                <a href="tel:{{contact.phone}}">{{ contact.phone }}</a>
-            </li>
+            {% for phone in phones %}
+                {% if forloop.first %}
+                    <li>
+                        <i class="organik-icon-calling"></i>
+                        <a href="tel:{{phone}}">{{ phone }}</a>
+                    </li>
+                {% else %}
+                    <li style="margin-top: 0px;">
+                        <a href="tel:{{phone}}" style="margin-left: 38px;">{{ phone }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
         </ul>
 
         <div class="mobile-nav__top">
