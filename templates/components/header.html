@@ -10,7 +10,16 @@
                 <div class="mobile-nav__buttons">
                     <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
                     <!-- <a href="javascript:void(0);" class="mini-cart__toggler"><i class="organik-icon-shopping-cart"></i></a> -->
-                    <a href="{% url 'cart:cart_detail' %}" ><i class="organik-icon-shopping-cart"></i></a>
+                    <a href="{% url 'cart:cart_detail' %}" >
+                        <i class="organik-icon-shopping-cart"></i>
+                        {% with total_items=cart|length %}
+                            {% if cart|length > 0 %}
+                                <span class="cart-count">{{ total_items }}</span>
+                            {% else %}
+                                <span class="cart-count" style="display: none;"></span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
                     
                 </div>
 
