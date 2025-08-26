@@ -1,6 +1,7 @@
 /*--------------------------------------------------------------
 >>> TABLE OF CONTENTS:
 ----------------------------------------------------------------
+# Fonts
 # Utility
 # Cards
 # Common
@@ -25,6 +26,25 @@
 /*--------------------------------------------------------------
 # Imports
 --------------------------------------------------------------*/
+
+/*--------------------------------------------------------------
+# Fonts
+--------------------------------------------------------------*/
+
+/* @font-face {
+    font-family: 'Roboto';
+    src: url('fonts/Roboto/Roboto-Regular.woff2') format('woff2'),
+         url('fonts/Roboto/Roboto-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('fonts/Montserrat/Montserrat-Regular.woff2') format('woff2'),
+         url('fonts/Montserrat/Montserrat-Regular.ttf') format('truetype');
+    font-weight: 400;
+} */
+
 
 /*--------------------------------------------------------------
 # Utility
@@ -1291,9 +1311,9 @@
 # Common
 --------------------------------------------------------------*/
 :root {
-  --thm-font: "Rubik", sans-serif;
-  --heading-font: "Rubik", sans-serif;
-  --special-font: "Abril Fatface", cursive;
+  --thm-font: "Montserrat", sans-serif;
+  --heading-font: "Montserrat", sans-serif;
+  --special-font: "Roboto", sans-serif;
   --thm-color: #717573;
   --thm-color-rgb: 113, 117, 115;
   --thm-base: #60be74;
