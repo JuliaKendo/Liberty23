@@ -20,6 +20,27 @@
 <section class="products-page">
     <div class="container">
         <div class="row">
+            <div class="col-12">
+                <!-- Хлебные крошки -->
+                {% if breadcrumbs %}
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb" style="background: transparent; padding: .5rem 0; margin: 0;">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'catalog:products' %}">Каталог</a>
+                            </li>
+                            {% for crumb in breadcrumbs %}
+                                {% if not forloop.last %}
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                    </nav>
+                {% endif %}
+            </div>
             <div class="col-sm-12 col-md-12 col-lg-3">
                 <div class="product-sidebar">
                     <div class="product-sidebar__single product-sidebar__search-widget">
@@ -33,13 +54,30 @@
                             <button class="organik-icon-magnifying-glass" type="submit"></button>
                         </form>
                     </div>
+                    <div class="product-sorter d-lg-none">
+                        <p>Всего {{ page_obj.start_index }}–{{ page_obj.end_index }} из {{ paginator.count }} товаров</p>
+                        <div class="product-sorter__select">
+                            <select class="selectpicker">
+                                {% if sort_by.name == "sort_ascending" %}
+                                    <option value="sort_ascending" selected>по возрастанию</option>
+                                {% else %}
+                                    <option value="sort_ascending">по возрастанию</option>
+                                {% endif %}
+                                {% if sort_by.name == "sort_descending" %}
+                                    <option value="sort_descending" selected>по убыванию</option>
+                                {% else %}
+                                    <option value="sort_descending">по убыванию</option>
+                                {% endif %}     
+                            </select>
+                        </div>
+                    </div>
                     
                     {% include "components/products/filters.html" %}    
 
                 </div>
             </div>
             <div class="col-sm-12 col-md-12 col-lg-9" id="products-container">
-                <div class="product-sorter">
+                <div class="product-sorter d-none d-lg-flex">
                     <p>Всего {{ page_obj.start_index }}–{{ page_obj.end_index }} из {{ paginator.count }} товаров</p>
                     <div class="product-sorter__select">
                         <select class="selectpicker">

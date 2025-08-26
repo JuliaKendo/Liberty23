@@ -136,10 +136,18 @@ class ProductsView(FiltersView, ListView):
         context['search_values'] = [
             item for elem in [value for key, value in self.filters.items() if key == 'search_values'] for item in elem
         ]
-        context['sort_by']   = self.sort_by
-        context['products']  = product_page
-        context['prices']    = Price.objects.available_prices(product_page)
-        context['MEDIA_URL'] = settings.MEDIA_URL
+        context['sort_by']     = self.sort_by
+        context['products']    = product_page
+        context['prices']      = Price.objects.available_prices(product_page)
+        context['MEDIA_URL']   = settings.MEDIA_URL
+        context['breadcrumbs'] = []
+        
+        if self.filters.get('category'):
+            current_category = Category.objects.filter(id=self.filters['category'][0]).first()
+            context['breadcrumbs'] = [{
+                "name": current_category.name,
+                "url": f"{self.request.path}?category={current_category.id}"
+            }]
 
         return context
 

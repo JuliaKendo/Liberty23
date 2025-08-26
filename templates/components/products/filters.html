@@ -19,12 +19,28 @@
 </div> -->
 
 <div class="product-sidebar__single">
-    <h3>Категории</h3>
-    <ul class="list-unstyled product-sidebar__links">
-        {% if "category" in filters %}
-            {% for item in filters.category.tree %}
-                <li><a href="{{ request.path }}?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}category={{ item|get_ident:'category__name' }}">{{ item.category__name }} <i class="fa fa-angle-right"></i></a></li>
-            {% endfor %}
-        {% endif %}
-    </ul>
+    <div class="d-none d-lg-block">
+        <h3>Категории</h3>
+        <ul class="list-unstyled product-sidebar__links mt-2">
+            {% if "category" in filters %}
+                {% for item in filters.category.tree %}
+                    <li><a href="{{ request.path }}?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}category={{ item|get_ident:'category__name' }}">{{ item.category__name }} <i class="fa fa-angle-right"></i></a></li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+    <h3 class="d-lg-none">
+        <a class="d-block text-dark" data-toggle="collapse" href="#collapseCategories" role="button" aria-expanded="false" aria-controls="collapseCategories" style="text-decoration:none;">
+            Категории <i class="fa fa-angle-down"></i>
+        </a>
+    </h3>
+    <div class="collapse d-lg-none" id="collapseCategories">
+        <ul class="list-unstyled product-sidebar__links mt-2">
+            {% if "category" in filters %}
+                {% for item in filters.category.tree %}
+                    <li><a href="{{ request.path }}?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}category={{ item|get_ident:'category__name' }}">{{ item.category__name }} <i class="fa fa-angle-right"></i></a></li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
 </div>
