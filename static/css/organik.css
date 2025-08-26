@@ -1673,14 +1673,14 @@ h6 {
 }
 
 .common-pagination {
-  position: relative;
-  top: -150px;
+  margin-top: 2rem;
+  padding-left: 70px;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
   .common-pagination {
-    position: relative;
-    top: -50px;
+    margin-top: 2rem;
+    padding-left: 0px;
   }
 }
 
@@ -4720,25 +4720,19 @@ h6 {
 .about-one {
   border-bottom: 2px solid #f4f4f4;
   position: relative;
-  padding-top: 80px;
+  padding-top: 0px;
   padding-bottom: 0px;
 }
 
 @media (min-width: 992px) {
-  .about-one .row {
-    margin-bottom: -100px;
-  }
-}
-
-@media (min-width: 992px) {
   .about-one {
-    padding-top: 80px;
+    padding-top: 50px;
     padding-bottom: 0px;
   }
 }
 
 .about-one__content {
-  margin-top: 50px;
+  margin-top: 0;
 }
 
 .about-one__content .img-float {

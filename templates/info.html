@@ -20,7 +20,7 @@
 <section class="about-one">
     <div class="container">
         {% for current_info in info %}
-        <div class="row">
+        <div class="row" style="background-image: url('{% static "/images/shapes/about-leaf-1-1.png" %}'); background-repeat: no-repeat; background-position: left bottom;">
             {% if current_info.picture %}
                 <div class="about-one__content">
                     <img src="{{ current_info.get_image }}" class="img-fluid img-float" alt="">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
             {% endif %}
-            <img src="{% static '/images/shapes/about-leaf-1-1.png' %}" alt="" class="about-one__shape-{{forloop.counter}}">
+            <!-- <img src="{% static '/images/shapes/about-leaf-1-1.png' %}" alt="" class="about-one__shape-{{forloop.counter}}"> -->
         </div>
         {% endfor %}
 
