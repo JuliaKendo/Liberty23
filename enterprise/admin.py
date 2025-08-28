@@ -12,6 +12,7 @@ from .models import (
     EnterpriseSetting,
     IntegrationSettings,
     Manager,
+    Banner,
 )
 from .forms import CustomIntegrationForm, PasswordInputForm
 from prices.models import DeliveryPrice
@@ -197,3 +198,14 @@ class InfoAdmin(SummernoteModelAdmin):
             return '(No image)'
 
     render_preview.short_description = 'Preview'
+
+
+@admin.register(Banner)
+class BannerAdmin(SummernoteModelAdmin):
+    search_fields = ['title',]
+    list_display = ['title', 'created_at',]
+    summernote_fields = ('html_content',)
+    fields = ['title', 'html_content', 'created_at',]
+    readonly_fields = ('created_at',)
+
+    list_display_links = list_display

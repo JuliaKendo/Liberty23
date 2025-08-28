@@ -1,8 +1,10 @@
+import html
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -10,7 +12,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .forms import SignUpForm
+from enterprise.models import Banner
 from enterprise.forms import AppealForm
+
+
+def start_page(request):
+    banner = Banner.objects.get_active_banner()
+    html_content = html.unescape(banner.html_content)
+    return render(request, 'index.html', context={'banner_content': mark_safe(html_content)})
 
 
 def signup(request):

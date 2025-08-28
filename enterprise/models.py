@@ -198,3 +198,28 @@ class Info(models.Model):
     @property
     def get_image(self):
         return self.picture.url
+
+
+class BannerQuerySet(models.QuerySet):
+
+    def get_active_banner(self):
+        active_banner = self.order_by('-created_at').first()
+        return active_banner
+
+
+class Banner(models.Model):
+    title = models.CharField('Наименование', max_length=200, db_index=True)
+    html_content = models.TextField('Содержание')
+    created_at = models.DateTimeField(
+        'Дата создания', db_index=True, auto_now_add=True
+    )
+
+    objects = BannerQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = 'Баннер'
+        verbose_name_plural = 'Баннеры'
+    
+    def __str__(self):
+        return self.title
+    

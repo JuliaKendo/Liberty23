@@ -24,7 +24,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('', render, kwargs={'template_name': 'index.html'}, name='start_page'),
+    path('', views.start_page, name='start_page'),
     path('about', render, kwargs={'template_name': 'about.html'}, name='about_page'),
     path('contact', views.contact, name='contact_page'),
     path('accounts/', include('django.contrib.auth.urls')),

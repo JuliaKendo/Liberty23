@@ -7564,15 +7564,17 @@ h6 {
   left: 0;
 }
 
-.offer-banner__box h3::after {
+/* .offer-banner__box h3::after {
   background-image: url(../images/shapes/offer-banner-leaf-1-2.png);
   right: 0;
-}
+} */
 
 .offer-banner__box p {
   font-size: 18px;
   color: var(--thm-color);
   font-weight: 400;
+  margin-top: 18px;
+  margin-bottom: 18px;
 }
 
 .offer-banner__box .thm-btn {
