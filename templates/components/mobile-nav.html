@@ -45,12 +45,7 @@
                 </select>
             </div> -->
             
-            {% if request.user.is_authenticated %}
-                <div class="main-menu__user">
-                    <i class="organik-icon-user main-menu__user_item"></i>
-                    <a href="{% url 'logout' %}" class="user__toggler main-menu__user_item">{{ request.user.username }}</a>
-                </div>
-            {% else %}
+            {% if not request.user.is_authenticated %}
                 <div class="main-menu__login">
                     <i class="organik-icon-user main-menu__login_item"></i>
                     <a href="#" class="login__toggler main-menu__login_item">Вход</a>
