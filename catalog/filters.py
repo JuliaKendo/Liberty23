@@ -107,7 +107,7 @@ class SearchFilter(object):
         values = self._convert_values()
         for index, field in enumerate(self.fields):
             for relevance, items in values:
-                queries = [Q((f'{field}', f'{item}')) for item in items]
+                queries = [Q((f'{field}', rf'\b{re.escape(item)}\b')) for item in items]
                 qs = self.qs.annotate(source=V(f'{index}'))\
                     .filter(reduce(lambda field, val: field | val, queries))
                 querysets.extend([{'obj': item, 'source': item.source, 'relevance': relevance} for item in qs])
