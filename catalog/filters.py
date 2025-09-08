@@ -3,6 +3,7 @@ import ast
 import json
 import django_filters
 from django_filters import BooleanFilter, CharFilter, BaseInFilter
+from django.db import connection
 from django.db.models import Count, Q, Case, When, IntegerField
 from django.db.models import Value as V
 from functools import reduce
@@ -107,7 +108,10 @@ class SearchFilter(object):
         values = self._convert_values()
         for index, field in enumerate(self.fields):
             for relevance, items in values:
-                queries = [Q((f'{field}', rf'\b{re.escape(item)}\b')) for item in items]
+                if connection.vendor == 'postgresql':
+                    queries = [Q((f'{field}', rf'\m{re.escape(item)}\M')) for item in items]
+                else:
+                    queries = [Q((f'{field}', rf'\b{re.escape(item)}\b')) for item in items]
                 qs = self.qs.annotate(source=V(f'{index}'))\
                     .filter(reduce(lambda field, val: field | val, queries))
                 querysets.extend([{'obj': item, 'source': item.source, 'relevance': relevance} for item in qs])
