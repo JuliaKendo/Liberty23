@@ -111,7 +111,7 @@ class ProductsView(FiltersView, ListView):
         if self.filters:
             filtred_products = ProductFilter(self.filters, queryset=products)
             products = filtred_products.qs
-        
+
         if 'name' in self.sort_by.keys():
             products = products.order_by('category__order', 'name')
             if self.sort_by['name'] == 'sort_descending':

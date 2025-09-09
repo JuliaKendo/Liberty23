@@ -37,6 +37,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('enterprise/', include('enterprise.urls')),
     path('terms_of_service', render, kwargs={'template_name': 'terms_of_service.html'}, name='terms_of_service'),
+    path('privacy_policy', render, kwargs={'template_name': 'privacy_policy.html'}, name='privacy_policy'),
 
     path('is_user_authenticated/', views.is_user_authenticated),
     path('auth-token/', views.AuthToken.as_view()),

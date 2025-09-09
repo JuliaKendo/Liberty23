@@ -34,16 +34,6 @@
         </ul>
 
         <div class="mobile-nav__top">
-
-            <!-- <div class="mobile-nav__language">
-                <img src="{% static '/images/resources/flag-1-1.jpg' %}" alt="">
-                <label class="sr-only" for="language-select">select language</label>
-                
-                <select class="selectpicker" id="language-select">
-                    <option value="english">English</option>
-                    <option value="arabic">Arabic</option>
-                </select>
-            </div> -->
             
             {% if not request.user.is_authenticated %}
                 <div class="main-menu__login">

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load news_tags %}
+{% block page %}
+
+<style>
+
+  h1, h2 {
+    color: #111;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 2rem;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  ol {
+    padding-left: 1.5rem;
+  }
+
+  .highlight {
+    background-color: #ffffcc;
+    font-weight: bold;
+    color: #006600;
+  }
+
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<section class="offer-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 wow fadeInLeft offer-banner__box animated" data-wow-duration="1500ms" data-wow-delay="100ms" style="visibility: visible; animation-duration: 1500ms; animation-delay: 100ms; animation-name: fadeInLeft;">
+
+                <h1>ПОЛИТИКА КОНФЕДЕНЦИАЛЬНОСТИ</h1>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

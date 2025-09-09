@@ -91,6 +91,10 @@
             <ul class="main-menu__list">
                 <li class="dropdown">
                     <a href="/">Главная</a>
+                    <ul class="special-list">
+                        <li><a href="{% url 'terms_of_service' %}">Пользовательское соглашение</a></li>
+                        <li><a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="{% url 'enterprise:news' %}">Новости</a>
