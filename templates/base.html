@@ -42,6 +42,11 @@
     <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=71db1fad-7278-47f2-9695-9d4486453e8c"></script>
     <!-- robokassa iFrame -->
     <script type="text/javascript" src="https://auth.robokassa.ru/Merchant/bundle/robokassa_iframe.js"></script>
+
+    <!-- constants -->
+    <script> window.DEPARTMENT = "{{ department|escapejs }}"; </script>
+    <script> window.IS_AUTH = "{{ request.user.is_authenticated|yesno:'true,false' }}"; </script>
+
 </head>
 
 <body>

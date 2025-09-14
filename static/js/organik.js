@@ -530,6 +530,16 @@
       console.log(e);
     });
   }
+  if ($(".handle-cart").length) {
+    $(".handle-cart").on("click", function (e) {
+      e.preventDefault();
+      if (window.IS_AUTH == "false") {
+          updateLoginForm('/accounts/login/');
+      } else {
+          window.location.href = '/cart/';
+      }
+    });
+  }
   function openLink(url) {
     console.log(url);
     window.open(url, "_blank");
@@ -809,35 +819,38 @@
     });
     $('.addto-cart-box button').on('click', (e) => {
       e.preventDefault();
-      const target = $(e.currentTarget);
-      const inCartQuantity = +target.parent().parent().find("div[name='cart_quantity']")?.text() || 0;
-      const $formData = new FormData();
-      const $form = target.parent().parent().find("form[name='cart-form']");
-      $.each($form.find('input'), (_, el) => {
-        if (el.name === 'quantity') {
-          $formData.append(el.name, el.value-inCartQuantity);
-        } else {
-          $formData.append(el.name, el.value);
-        }
-      });
-      let url = target.data('url');
-      if ($formData.get('quantity') <= 0) 
-        url = url.replace('update', 'remove');
-      updateCart($formData, url)
-        .then(_ => {
-          location.reload();
-        })
-        .catch(error => {
-          if (error?.responseJSON) {
-            handleException(
-              {'status': error.status, 'responseText': error.responseJSON.error},
-              true
-            );
+      if (window.IS_AUTH == "true") {
+        const target = $(e.currentTarget);
+        const inCartQuantity = +target.parent().parent().find("div[name='cart_quantity']")?.text() || 0;
+        const $formData = new FormData();
+        const $form = target.parent().parent().find("form[name='cart-form']");
+        $.each($form.find('input'), (_, el) => {
+          if (el.name === 'quantity') {
+            $formData.append(el.name, el.value-inCartQuantity);
           } else {
-            handleException(error, true);
+            $formData.append(el.name, el.value);
           }
         });
-
+        let url = target.data('url');
+        if ($formData.get('quantity') <= 0) 
+          url = url.replace('update', 'remove');
+        updateCart($formData, url)
+          .then(_ => {
+            location.reload();
+          })
+          .catch(error => {
+            if (error?.responseJSON) {
+              handleException(
+                {'status': error.status, 'responseText': error.responseJSON.error},
+                true
+              );
+            } else {
+              handleException(error, true);
+            }
+          });
+        } else {
+          updateLoginForm('/accounts/login/');
+        }
     });
   }
   function updateCartAmounts() {
@@ -868,29 +881,32 @@
       }
 
       e.preventDefault();
-      const $form = e.currentTarget.querySelector("form[name='add-to-cart-form']");
-      updateCart($form, $form.action)
-        .then(cartItem => {
-          updateCartElements(cartItem);     
-          updateMiniCart(`${location.origin}/cart/mini`)
-            .then(html => {
-              document.querySelector('.mini-cart').outerHTML = html;
-              CartEvents();
-            })
-            .catch(error => handleException(error));
-        })
-        .catch(error => {
-          if (error?.responseJSON) {
-            let cartItem = error.responseJSON?.data.find(_=>true);
-            if (cartItem) updateCartElements(cartItem);
-            handleException({'status': error.status, 'responseText': error.responseJSON.error});
-          } else {
-            handleException(error);
-          }
-        })
+      if (window.IS_AUTH == "true") {
+        const $form = e.currentTarget.querySelector("form[name='add-to-cart-form']");
+        updateCart($form, $form.action)
+          .then(cartItem => {
+            updateCartElements(cartItem);     
+            updateMiniCart(`${location.origin}/cart/mini`)
+              .then(html => {
+                document.querySelector('.mini-cart').outerHTML = html;
+                CartEvents();
+              })
+              .catch(error => handleException(error));
+          })
+          .catch(error => {
+            if (error?.responseJSON) {
+              let cartItem = error.responseJSON?.data.find(_=>true);
+              if (cartItem) updateCartElements(cartItem);
+              handleException({'status': error.status, 'responseText': error.responseJSON.error});
+            } else {
+              handleException(error);
+            }
+          })
+      } else {
+        updateLoginForm('/accounts/login/');
+      };
     });  
   }
-
   function handleCartItems(target) {
 
     const updateCartElements = (target, cartItem) => {

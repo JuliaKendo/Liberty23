@@ -53,7 +53,8 @@
                 <div class="topbar__buttons">
                     <a href="javascript:void(0);" class="search-toggler"><i class="organik-icon-magnifying-glass"></i></a>
                     <!-- <a href="javascript:void(0);" class="mini-cart__toggler"> -->
-                    <a href="{% url 'cart:cart_detail' %}">
+                    <!-- <a href="{% url 'cart:cart_detail' %}"> -->
+                    <a href="javascript:void(0);" class="handle-cart">
                         <i class="organik-icon-shopping-cart"></i>
                         {% with total_items=cart|length %}
                             {% if cart|length > 0 %}
@@ -76,9 +77,9 @@
                     <i class="organik-icon-user main-menu__user_item"></i>
                     <a href="{% url 'logout' %}" class="user__toggler main-menu__user_item">{{ request.user.username }}</a>
                 </div>
-                <div class="main-menu__department">
+                <!-- <div class="main-menu__department">
                     <a href="javascript:void(0);" name="make-order" class="make-order" data-url="{% url 'enterprise:departments' %}">{{ department.name }}</a>
-                </div>
+                </div> -->
             {% else %}
                 <div class="main-menu__login">
                     <i class="organik-icon-user main-menu__login_item"></i>
@@ -99,16 +100,20 @@
                 <li>
                     <a href="{% url 'enterprise:news' %}">Новости</a>
                 </li>
-                {% if department.name %}
                     <li class="dropdown">
                         <a href="javascript:void(0);">Каталог</a>
                         <ul>
-                            <li><a href="{% url 'catalog:products' %}">Каталог</a></li>
-                            <li><a href="{% url 'cart:cart_detail' %}">Корзина</a></li>
-                            <li><a href="{% url 'orders:list' %}">Заказы</a></li>
+                            {% if department.name %}
+                                <li><a href="{% url 'catalog:products' %}">Каталог</a></li>
+                                {% if request.user.is_authenticated %}
+                                    <li><a href="{% url 'cart:cart_detail' %}">Корзина</a></li>
+                                    <li><a href="{% url 'orders:list' %}">Заказы</a></li>
+                                {% endif %}
+                            {% else %}
+                                <li><a href="javascript:void(0);" name="make-order" data-url="{% url 'enterprise:departments' %}">Каталог</a></li>
+                            {% endif %}
                         </ul>
                     </li>
-                {% endif %}
                 <li><a href="/contact">Контакты</a></li>
                 <li>
                     <a href="{% url 'enterprise:info' %}">Информация</a>

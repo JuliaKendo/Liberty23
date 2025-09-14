@@ -2864,14 +2864,18 @@ h6 {
 }
 
 .main-slider .swiper-slide .container {
-  /* padding-top: 190px;
-  padding-bottom: 224px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding-top: 40px;
   height: 600px;
 }
 
 @media (max-width: 1698px) {
   .main-slider .swiper-slide .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-top: 50px;
     height: 550px;
   }
@@ -2879,6 +2883,9 @@ h6 {
 
 @media (max-width: 1492px) {
   .main-slider .swiper-slide .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-top: 55px;
     height: 500px;
   }
@@ -2886,6 +2893,9 @@ h6 {
 
 @media (max-width: 1197px) {
   .main-slider .swiper-slide .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-top: 74px;
     height: 400px;
   }
@@ -2893,8 +2903,9 @@ h6 {
 
 @media (max-width: 991px) {
   .main-slider .swiper-slide .container {
-    /* padding-top: 130px;
-    padding-bottom: 130px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-top: 74px;
     height: 400px;
   }
@@ -2902,6 +2913,9 @@ h6 {
 
 @media (max-width: 425px) {
   .main-slider .swiper-slide .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-top: 110px;
     padding-bottom: 110px;
   }
@@ -3248,6 +3262,7 @@ h6 {
 .main-slider__two .swiper-slide .thm-btn {
   margin-top: 55px;
 }
+
 
 /*--------------------------------------------------------------
 # Page Header

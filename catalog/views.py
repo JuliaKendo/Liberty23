@@ -31,9 +31,9 @@ from prices.models import Price
 from cart.cart import Cart
 
 
-class FiltersView(LoginRequiredMixin, TemplateView):
+class FiltersView(TemplateView):
     template_name = 'components/products/filters.html'
-    login_url = '/'
+    # login_url = '/'
 
     def get_filter(self, qs=None, func='', field='', *groups, **kwargs):
         if qs: 
@@ -123,7 +123,7 @@ class ProductsView(FiltersView, ListView):
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
 
-        paginator = Paginator(context['products'], self.paginate_by)
+        paginator = Paginator(self.object_list, self.paginate_by)
         page = self.request.GET.get('page')
         
         try:
@@ -152,13 +152,13 @@ class ProductsView(FiltersView, ListView):
         return context
 
 
-class ProductCardView(LoginRequiredMixin, DetailView):
+class ProductCardView(DetailView):
     model = Product
     template_name = 'product-details.html'
     slug_url_kwarg = 'id'
     slug_field = 'pk'
     context_object_name = 'product'
-    login_url = '/'
+    # login_url = '/'
 
     def get_similar_products(self, product):
         result = re.sub(r'\b\w{1,5}\b', '', product.name)
