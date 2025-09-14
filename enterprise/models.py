@@ -52,7 +52,7 @@ class Contacts(SingletonModel):
     additional_email = models.CharField('доп. email', max_length=150, blank=True)
     address = models.CharField('Адерс', max_length=250, blank=True, default='')
     fax = PhoneNumberField('факс', blank=True)
-    insta = models.URLField('Инстаграмм', max_length=250, blank=True,)
+    insta = models.URLField('Youtube', max_length=250, blank=True,)
     ok = models.URLField('Однокласники', max_length=250, blank=True,)
     fb = models.URLField('Facebook', max_length=250, blank=True,)
     vk = models.URLField('В Контакте', max_length=250, blank=True,)
