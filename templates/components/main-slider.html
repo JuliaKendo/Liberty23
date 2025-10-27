@@ -21,12 +21,12 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 text-center">
-                            <h2><span>Свобода 23</span></h2>
+                            <h2><span>Органика</span></h2>
                             {% if request.user.is_authenticated %}
                                 {% if department.name %}
                                     <a href="{% url 'catalog:products' %}" class=" thm-btn">Сделать заказ</a>
                                 {% else %}
-                                    <a href="javascript:void(0);" name="make-order" class=" thm-btn" data-url="{% url 'enterprise:departments' %}">Сделать заказ</a>
+                                    <a href="javascript:void(0);" name="make-order" class=" thm-btn" data-url="{% url 'enterprise:departments' %}">Интернет магазин</a>
                                 {% endif %}   
                             {% endif %}
                         </div>
@@ -39,7 +39,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 text-center">
-                            <h2 class="main-description">Доставка передач в исправительные учреждения</h2>
+                            <h2 class="main-description">Доставка продуктов</h2>
                             {% if request.user.is_authenticated %}
                                 {% if department.name %}
                                     <a href="{% url 'catalog:products' %}" class=" thm-btn">Сделать заказ</a>

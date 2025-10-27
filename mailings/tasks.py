@@ -64,7 +64,7 @@ def send_email(html_content, recipient_list, **params):
         email = EmailMessage(
             params['subject'],
             html_content,
-            f'Свобода 23 <{settings.EMAIL_HOST_USER}>',
+            f'Интернет магазин <{settings.EMAIL_HOST_USER}>',
             [recipient],
             # reply_to=['TALANT<opt@talantgold.ru>'],
         )

@@ -465,8 +465,8 @@
           }),
   
           myPlacemark = new ymaps.Placemark(myMap.getCenter(), {
-              hintContent: 'Свобода 23',
-              balloonContent: 'Краснодар ул.Воронежская 42'
+              hintContent: 'Органика',
+              balloonContent: 'Краснодар'
           }, {
               iconLayout: 'default#image',
               iconImageHref: 'static/images/logo-main.png',
